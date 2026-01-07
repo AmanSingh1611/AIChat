@@ -8,16 +8,13 @@
 import SwiftUI
 
 struct AppView: View {
-    @AppStorage("showTabbarView") var showTabBarView: Bool = false
+    @AppStorage("showTabbarView") var showTabBarView: Bool = true
     
     var body: some View {
         AppViewBuilder(
             showTabBarView: showTabBarView,
             tabbarView: {
-                ZStack {
-                    Color.red.ignoresSafeArea()
-                    Text("TabBarView")
-                }
+                TabBarView()
             },
             onboardingView: {
                 ZStack {

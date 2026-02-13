@@ -38,7 +38,7 @@ struct AvatarModel: Hashable {
     }
     
     var description: String {
-        AvatarDescriptionBuulder(avatar: self).characterDescription
+        AvatarDescriptionBuilder(avatar: self).characterDescription
     }
     
     static var mock: AvatarModel {
@@ -91,7 +91,7 @@ struct AvatarModel: Hashable {
     }
 }
 
-struct AvatarDescriptionBuulder {
+struct AvatarDescriptionBuilder {
     let characterOption: CharacterOption
     let characterAction: CharacterAction
     let characterLocation: CharacterLocation
@@ -106,7 +106,7 @@ struct AvatarDescriptionBuulder {
         self.characterLocation = characterLocation
     }
     
-    init(avatar: AvatarModel){
+    init(avatar: AvatarModel) {
         self.characterOption = avatar.characterOption ?? .default
         self.characterAction = avatar.characterAction ?? .default
         self.characterLocation = avatar.characterLocation ?? .default
@@ -117,7 +117,7 @@ struct AvatarDescriptionBuulder {
     }
 }
 
-enum CharacterOption: String {
+enum CharacterOption: String, Hashable, CaseIterable {
     case man, woman, cat, dog, alien
     
     static var `default`: Self {

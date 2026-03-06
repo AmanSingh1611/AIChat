@@ -19,7 +19,7 @@ extension View {
         .cornerRadius(16)
     }
     
-    func tapablebackground() -> some View {
+    func tappablebackground() -> some View {
         self.background(Color.black.opacity(0.001))
     }
     

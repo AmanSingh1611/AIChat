@@ -48,7 +48,7 @@ struct WelcomeView: View {
                 .underline()
                 .font(.body)
                 .padding(10)
-                .tapablebackground()
+                .tappablebackground()
                 .onTapGesture {
                     
                 }

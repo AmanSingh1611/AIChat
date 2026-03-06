@@ -13,7 +13,7 @@ struct ImageLoaderView: View {
     var resizingMode: ContentMode = .fill
     var body: some View {
         Rectangle()
-            .opacity(0)
+            .opacity(0.001)
             .overlay {
                 WebImage(url: URL(string: urlString)!)
                     .resizable()
@@ -27,5 +27,8 @@ struct ImageLoaderView: View {
 
 #Preview {
     ImageLoaderView()
-        .frame(width: 200)
+        .frame(width: 200, height: 200)
+        .anyButton(.highlight) {
+            
+        }
 }

@@ -25,27 +25,17 @@ struct OnboardingCompletedView: View {
                     .foregroundStyle(.secondary)
             }
             .frame(maxHeight: .infinity)
-            .safeAreaInset(edge: .bottom, content: {
-               ctaButton
+            .safeAreaInset(
+                edge: .bottom,
+                content: {
+                    AsyncCallToActionButton(
+                        title: "Finish",
+                        isLoading: isCompletingProfileSetup,
+                        action: onFinishButtonPressed
+                    )
             })
             .padding(24)
         }
-    }
-    
-    private var ctaButton: some View {
-        ZStack {
-            if isCompletingProfileSetup {
-                ProgressView()
-                    .tint(.white)
-            } else {
-                Text("Finish")
-            }
-        }
-        .callToActionButton()
-        .anyButton {
-            onFinishButtonPressed()
-        }
-        .disabled(isCompletingProfileSetup)
     }
     
     private func onFinishButtonPressed() {

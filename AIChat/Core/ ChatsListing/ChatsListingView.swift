@@ -1,5 +1,5 @@
 //
-//  ChatsView.swift
+//  ChatsListingView.swift
 //  AIChat
 //
 //  Created by Aman on 07/01/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ChatsView: View {
+struct ChatsListingView: View {
     @State private var chats: [ChatModel] = ChatModel.mocks
     
     var body: some View {
@@ -38,5 +38,5 @@ struct ChatsView: View {
 }
 
 #Preview {
-    ChatsView()
+    ChatsListingView()
 }

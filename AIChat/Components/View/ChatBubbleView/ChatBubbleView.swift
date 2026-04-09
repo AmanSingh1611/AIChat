@@ -44,7 +44,6 @@ struct ChatBubbleView: View {
 }
 
 #Preview {
-    //ChatBubbleView 10:00
     ScrollView {
         VStack(spacing: 16) {
             ChatBubbleView()

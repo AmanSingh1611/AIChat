@@ -50,7 +50,7 @@ struct ExploreView: View {
                     HStack(spacing: 12) {
                         ForEach(categories, id: \.self) { category in
                             CategoryCellView(
-                                title: category.rawValue,
+                                title: category.plural.capitalized,
                                 imageName: Constants.randomImage,
                                 font: .body,
                                 cornerRadius: 16

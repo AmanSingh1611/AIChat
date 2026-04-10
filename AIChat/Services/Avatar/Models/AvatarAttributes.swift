@@ -34,6 +34,20 @@ struct AvatarDescriptionBuilder {
 enum CharacterOption: String, Hashable, CaseIterable {
     case man, woman, cat, dog, alien
     
+    var plural: String {
+        switch self {
+        case .man:
+            "men"
+        case .woman:
+            "women"
+        case .cat:
+            "cats"
+        case .dog:
+            "dogs"
+        case .alien:
+            "aliens"
+        }
+    }
     static var `default`: Self {
         .man
     }

@@ -9,11 +9,7 @@ import FirebaseAuth
 import SwiftUI
 import SignInAppleAsync
 
-extension EnvironmentValues {
-    @Entry var authService: FirebaseAuthService = FirebaseAuthService()
-}
-
-struct FirebaseAuthService {
+struct FirebaseAuthService: AuthService {
     func getAuthenticatedUser() -> UserAuthInfo? {
         if let user = Auth.auth().currentUser {
             return UserAuthInfo(user: user)
@@ -37,7 +33,7 @@ struct FirebaseAuthService {
         )
         
         /// Try to link the existing anonymous user
-        if let user = Auth.auth().currentUser, user.isAnonymous{
+        if let user = Auth.auth().currentUser, user.isAnonymous {
             do {
                 let result =  try await user.link(with: credential)
                 return result.asAuthInfo
@@ -45,12 +41,11 @@ struct FirebaseAuthService {
                 let authError = AuthErrorCode(rawValue: error.code)
                 
                 switch authError {
-                case .providerAlreadyLinked,.credentialAlreadyInUse:
+                case .providerAlreadyLinked, .credentialAlreadyInUse:
                     if let secondaryCredential = error.userInfo["FIRAuthErrorUserInfoUpdatedCredentialKey"] as? AuthCredential {
                         let result = try await Auth.auth().signIn(with: secondaryCredential)
                         return result.asAuthInfo
                     }
-                    break
                 default:
                     break
                 }
@@ -72,16 +67,6 @@ struct FirebaseAuthService {
         }
         try await user.delete()
     }
-    enum AuthError: LocalizedError {
-        case userNotFound
-        
-        var errorDescription: String? {
-            switch self {
-            case .userNotFound:
-                "Current authenticated user not found."
-            }
-        }
-    }
 }
 
 extension AuthDataResult {
@@ -92,3 +77,14 @@ extension AuthDataResult {
         return (user, isNewUser)
     }
 }
+
+enum AuthError: LocalizedError {
+    case userNotFound
+    
+    var errorDescription: String? {
+        switch self {
+        case .userNotFound:
+            "Current authenticated user not found."
+        }
+    }
+    }

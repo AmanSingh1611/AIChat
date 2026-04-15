@@ -8,23 +8,57 @@
 import Foundation
 import SwiftUI
 
-struct UserModel {
+struct UserModel: Codable {
     
     let userId: String
-    let dateCreated: Date?
+    let email: String?
+    let isAnonymous: Bool?
+    let lastSignInDate: Date?
+    let creationDate: Date?
     let didCompleteOnboarding: Bool?
     let profileColorHex: String?
+    let creationVersion: String?
     
     init(
         userId: String,
-        dateCreated: Date?,
-        didCompleteOnboarding: Bool?,
-        profileColorHex: String?
+        email: String? = nil,
+        isAnonymous: Bool? = nil,
+        lastSignInDate: Date? = nil,
+        creationDate: Date? = nil,
+        didCompleteOnboarding: Bool? = nil,
+        profileColorHex: String? = nil,
+        creationVersion: String? = nil
     ) {
         self.userId = userId
-        self.dateCreated = dateCreated
+        self.email = email
+        self.isAnonymous = isAnonymous
+        self.lastSignInDate = lastSignInDate
+        self.creationDate = creationDate
         self.didCompleteOnboarding = didCompleteOnboarding
         self.profileColorHex = profileColorHex
+        self.creationVersion = creationVersion
+    }
+    
+    init(userAuth: UserAuthInfo, creationVersion: String?) {
+        self.init(
+            userId: userAuth.uid,
+            email: userAuth.email,
+            isAnonymous: userAuth.isAnonymous,
+            lastSignInDate: userAuth.lastSignInDate,
+            creationDate: userAuth.creationDate,
+            creationVersion: creationVersion
+        )
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case userId = "user_id"
+        case email
+        case isAnonymous = "is_anonymous"
+        case lastSignInDate = "last_sign_date_date"
+        case creationDate = "creation_date"
+        case didCompleteOnboarding = "did_complete_onboarding"
+        case profileColorHex = "profile_color_hex"
+        case creationVersion = "creation_version"
     }
     
     static var mock: UserModel {
@@ -37,28 +71,28 @@ struct UserModel {
         return [
             UserModel(
                 userId: "user_1",
-                dateCreated: now.addTimeInterval(days: -10),
+                creationDate: now.addTimeInterval(days: -10),
                 didCompleteOnboarding: true,
                 profileColorHex: "#4ECDC4"
             ),
             
             UserModel(
                 userId: "user_2",
-                dateCreated: now.addTimeInterval(days: -8, hours: -3),
+                creationDate: now.addTimeInterval(days: -8, hours: -3),
                 didCompleteOnboarding: true,
                 profileColorHex: "#FF6B6B"
             ),
             
             UserModel(
                 userId: "user_3",
-                dateCreated: now.addTimeInterval(days: -5, minutes: -20),
+                creationDate: now.addTimeInterval(days: -5, minutes: -20),
                 didCompleteOnboarding: false,
                 profileColorHex: "#556270"
             ),
             
             UserModel(
                 userId: "user_4",
-                dateCreated: now.addTimeInterval(days: -2, hours: -4),
+                creationDate: now.addTimeInterval(days: -2, hours: -4),
                 didCompleteOnboarding: true,
                 profileColorHex: "#C7F464"
             )

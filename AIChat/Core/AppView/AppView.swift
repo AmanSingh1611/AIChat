@@ -52,10 +52,10 @@ struct AppView: View {
             do {
                 let result = try await authManager.signInAnonymously()
                 
-                //Log into application
+                // Log into application
                 print("Sign in anonymous success.", result.user.uid)
                 
-                //Log in
+                // Log in
                 try await userManager.logIn(userAuth: result.user, isNewUser: result.isNewUser)
                 
             } catch {
@@ -69,8 +69,12 @@ struct AppView: View {
 
 #Preview {
     AppView(appState: AppState(showTabBarView: true))
+        .environment(AuthManager(service: MockAuthService(user: .mock())))
+        .environment(UserManager(service: MockUserService(user: .mock)))
 }
 
 #Preview {
     AppView(appState: AppState(showTabBarView: false))
+        .environment(AuthManager(service: MockAuthService(user: nil)))
+        .environment(UserManager(service: MockUserService(user: nil)))
 }

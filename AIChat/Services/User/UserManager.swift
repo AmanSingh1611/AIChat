@@ -5,92 +5,29 @@
 //  Created by Aman on 15/04/26.
 //
 
-import Foundation
 import SwiftUI
 import SwiftfulUtilities
-
-protocol UserService: Sendable {
-    func saveUser(user: UserModel) async throws
-    func addListener(to userId: String) -> AsyncThrowingStream<UserModel, Error>
-    func deleteUser(userId: String) async throws
-    func markOnboardingCompleted(userId: String, profileColorHex: String) async throws
-}
-
-struct MockUserService: UserService {
-    
-    let currentUser: UserModel?
-    
-    init(user: UserModel? = nil) {
-        self.currentUser = user
-    }
-    
-    func saveUser(user: UserModel) async throws {
-        
-    }
-    
-    func addListener(to userId: String) -> AsyncThrowingStream<UserModel, any Error> {
-        AsyncThrowingStream { continuation in
-            if let currentUser {
-                continuation.yield(currentUser)
-            }
-        }
-    }
-    
-    func deleteUser(userId: String) async throws {
-        
-    }
-    
-    func markOnboardingCompleted(userId: String, profileColorHex: String) async throws {
-        
-    }
-
-}
-
-import FirebaseFirestore
-import SwiftfulFirestore
-
-struct FirebaseUserService: UserService {
-    var collection: CollectionReference {
-        Firestore.firestore().collection("users")
-    }
-    
-    func saveUser(user: UserModel) async throws {
-        try collection.document(user.userId).setData(from: user, merge: true)
-    }
-    
-    func addListener(to userId: String) -> AsyncThrowingStream<UserModel, any Error> {
-        collection.streamDocument(id: userId)
-    }
-    
-    func deleteUser(userId: String) async throws {
-        try await collection.document(userId).delete()
-    }
-    
-    func markOnboardingCompleted(userId: String, profileColorHex: String) async throws {
-        try await collection.document(userId).setData([
-            UserModel.CodingKeys.didCompleteOnboarding.rawValue: true,
-            UserModel.CodingKeys.profileColorHex.rawValue: profileColorHex
-        ], merge: true)
-    }
-}
 
 @MainActor
 @Observable
 class UserManager {
-    private let service: UserService
+    private let remote: RemoteUserService
+    private let local: LocalUserPersistence
+    
     private(set) var currentUser: UserModel?
     private var listenerTask: Task<Void, Never>?
     
-    init(service: UserService) {
-        self.service = service
-        currentUser = nil
+    init(services: UserServices) {
+        self.remote = services.remote
+        self.local = services.local
+        self.currentUser = local.getCurrentUser()
     }
     
     func logIn(userAuth: UserAuthInfo, isNewUser: Bool) async throws {
         let creationVersion = isNewUser ? Utilities.appVersion : nil
         
         let user = UserModel(userAuth: userAuth, creationVersion: creationVersion)
-        try await service.saveUser(user: user)
+        try await remote.saveUser(user: user)
         addCurrentUserListner(userId: user.userId)
         
     }
@@ -100,9 +37,10 @@ class UserManager {
 
         listenerTask = Task {
             do {
-                for try await value in service.addListener(to: userId) {
+                for try await value in remote.addListener(to: userId) {
                     self.currentUser = value
-                    print("Successfully added listener to user \(value.userId)")
+                    self.saveCurrentUserLocally()
+                    print("Successfully added listener to user \(value?.userId ?? "no id")")
                 }
             } catch {
                 print("Error with adding listner to user: \(error)")
@@ -112,7 +50,7 @@ class UserManager {
     
     func markOnboardingCompleteForCurrentuser(profileColorHex: String) async throws {
         let userId = try currentUserId()
-        try await service.markOnboardingCompleted(userId: userId, profileColorHex: profileColorHex)
+        try await remote.markOnboardingCompleted(userId: userId, profileColorHex: profileColorHex)
     }
     
     func signOut() {
@@ -123,7 +61,7 @@ class UserManager {
     
     func deleteCurrentUser() async throws {
         let userId = try currentUserId()
-        try await service.deleteUser(userId: userId)
+        try await remote.deleteUser(userId: userId)
         signOut()
     }
     
@@ -132,6 +70,17 @@ class UserManager {
             throw UserManagerError.noUserId
         }
         return userId
+    }
+    
+    func saveCurrentUserLocally() {
+        Task {
+            do {
+                try local.saveCurrentUser(user: currentUser)
+                print("Success saved current user locally.")
+            } catch {
+                print("Error saving current user locally \(error).")
+            }
+        }
     }
     
     enum UserManagerError: LocalizedError {

@@ -11,7 +11,7 @@ import SwiftfulUtilities
 
 protocol UserService: Sendable {
     func saveUser(user: UserModel) async throws
-    func addListner(to userId: String) -> AsyncThrowingStream<UserModel?, Error>
+    func addListener(to userId: String) -> AsyncThrowingStream<UserModel, Error>
     func deleteUser(userId: String) async throws
     func markOnboardingCompleted(userId: String, profileColorHex: String) async throws
 }
@@ -28,7 +28,7 @@ struct MockUserService: UserService {
         
     }
     
-    func addListner(to userId: String) -> AsyncThrowingStream<UserModel?, any Error> {
+    func addListener(to userId: String) -> AsyncThrowingStream<UserModel, any Error> {
         AsyncThrowingStream { continuation in
             if let currentUser {
                 continuation.yield(currentUser)
@@ -58,28 +58,8 @@ struct FirebaseUserService: UserService {
         try collection.document(user.userId).setData(from: user, merge: true)
     }
     
-    func addListner(to userId: String) -> AsyncThrowingStream<UserModel?, any Error> {
-        AsyncThrowingStream { continuation in
-             _ = collection.document(userId).addSnapshotListener { snapshot, error in
-                if let error {
-                    continuation.finish(throwing: error)
-                    return
-                }
-                
-                guard let snapshot else {
-                    continuation.yield(nil)
-                    return
-                }
-                
-                do {
-                    let model = try snapshot.data(as: UserModel.self)
-                    
-                    continuation.yield(model)
-                } catch {
-                    continuation.finish(throwing: error)
-                }
-            }
-        }
+    func addListener(to userId: String) -> AsyncThrowingStream<UserModel, any Error> {
+        collection.streamDocument(id: userId)
     }
     
     func deleteUser(userId: String) async throws {
@@ -90,7 +70,7 @@ struct FirebaseUserService: UserService {
         try await collection.document(userId).setData([
             UserModel.CodingKeys.didCompleteOnboarding.rawValue: true,
             UserModel.CodingKeys.profileColorHex.rawValue: profileColorHex
-        ])
+        ], merge: true)
     }
 }
 
@@ -98,11 +78,12 @@ struct FirebaseUserService: UserService {
 @Observable
 class UserManager {
     private let service: UserService
-    var currentUser: UserModel?
+    private(set) var currentUser: UserModel?
     private var listenerTask: Task<Void, Never>?
     
     init(service: UserService) {
         self.service = service
+        currentUser = nil
     }
     
     func logIn(userAuth: UserAuthInfo, isNewUser: Bool) async throws {
@@ -115,11 +96,13 @@ class UserManager {
     }
     
     func addCurrentUserListner(userId: String) {
+        listenerTask?.cancel()
+
         listenerTask = Task {
             do {
-                for try await value in service.addListner(to: userId) {
+                for try await value in service.addListener(to: userId) {
                     self.currentUser = value
-                    print("Successfully added listener to user \(value?.userId ?? "no id")")
+                    print("Successfully added listener to user \(value.userId)")
                 }
             } catch {
                 print("Error with adding listner to user: \(error)")

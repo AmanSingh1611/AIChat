@@ -45,7 +45,7 @@ struct ProfileView: View {
     private func loadData() async {
         self.currentUser = userManager.currentUser
         
-        try? await Task.sleep(for: .seconds(5))
+        try? await Task.sleep(for: .seconds(1))
         isLoading = false
         myAvatars = AvatarModel.mocks
     }

@@ -65,10 +65,10 @@ struct ChatRowCellViewBuilder: View {
 #Preview {
     VStack {
         ChatRowCellViewBuilder(currentUserId: nil, chat: .mock, getAvatar: {
-            try? await Task.sleep(for: .seconds(5))
+            try? await Task.sleep(for: .seconds(1))
             return .mock
         }, getLastChatMessage: {
-            try? await Task.sleep(for: .seconds(5))
+            try? await Task.sleep(for: .seconds(1))
             return .mock
         })
         

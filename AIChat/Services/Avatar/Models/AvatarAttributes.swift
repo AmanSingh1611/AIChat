@@ -31,7 +31,7 @@ struct AvatarDescriptionBuilder {
     }
 }
 
-enum CharacterOption: String, Hashable, CaseIterable {
+enum CharacterOption: String, Hashable, CaseIterable, Codable {
     case man, woman, cat, dog, alien
     
     var plural: String {
@@ -53,7 +53,7 @@ enum CharacterOption: String, Hashable, CaseIterable {
     }
 }
 
-enum CharacterAction: String, Hashable, CaseIterable {
+enum CharacterAction: String, Hashable, CaseIterable, Codable {
     case smiling, sitting, eating, walking, studing, shopping, working, relaxing, fighting, crying
     
     static var `default`: Self {
@@ -61,7 +61,7 @@ enum CharacterAction: String, Hashable, CaseIterable {
     }
 }
 
-enum CharacterLocation: String, Hashable, CaseIterable {
+enum CharacterLocation: String, Hashable, CaseIterable, Codable {
     case park, mall, museum, city, desert, forest, space
     
     static var `default`: Self {

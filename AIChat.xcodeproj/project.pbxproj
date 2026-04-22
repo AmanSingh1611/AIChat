@@ -13,6 +13,7 @@
 		0754488E2F8F7283007F7550 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 0754488D2F8F7283007F7550 /* FirebaseFirestore */; };
 		075448912F8F887E007F7550 /* SwiftfulFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 075448902F8F887E007F7550 /* SwiftfulFirestore */; };
 		075448E42F90D3EA007F7550 /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 075448E32F90D3EA007F7550 /* OpenAI */; };
+		075449672F924DFE007F7550 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 075449662F924DFE007F7550 /* FirebaseStorage */; };
 		07E0F4D22F8CDDBB0036A812 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 07E0F4D12F8CDDBB0036A812 /* FirebaseAuth */; };
 /* End PBXBuildFile section */
 
@@ -67,6 +68,7 @@
 				075448912F8F887E007F7550 /* SwiftfulFirestore in Frameworks */,
 				07E0F4D22F8CDDBB0036A812 /* FirebaseAuth in Frameworks */,
 				075448E42F90D3EA007F7550 /* OpenAI in Frameworks */,
+				075449672F924DFE007F7550 /* FirebaseStorage in Frameworks */,
 				0754488E2F8F7283007F7550 /* FirebaseFirestore in Frameworks */,
 				074CA7642F711D3000E5BAF7 /* SwiftfulUtilities in Frameworks */,
 			);
@@ -145,6 +147,7 @@
 				0754488D2F8F7283007F7550 /* FirebaseFirestore */,
 				075448902F8F887E007F7550 /* SwiftfulFirestore */,
 				075448E32F90D3EA007F7550 /* OpenAI */,
+				075449662F924DFE007F7550 /* FirebaseStorage */,
 			);
 			productName = AIChat;
 			productReference = 070B45762F0B900200B01908 /* AIChat.app */;
@@ -744,6 +747,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 075448E22F90D3EA007F7550 /* XCRemoteSwiftPackageReference "OpenAI" */;
 			productName = OpenAI;
+		};
+		075449662F924DFE007F7550 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 07E0F4D02F8CDDBB0036A812 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
 		};
 		07E0F4D12F8CDDBB0036A812 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;

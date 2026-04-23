@@ -45,6 +45,6 @@ struct Dependencies {
         self.authManager = AuthManager(service: FirebaseAuthService())
         self.userManager = UserManager(services: ProductionUserServices())
         self.aiManager = AIManager(service: AppleAIService())
-        self.avatarManager = AvatarManager(service: FirebaseAvatarService())
+        self.avatarManager = AvatarManager(service: FirebaseAvatarService(), local: SwiftDataLocalAvatarPersistance())
     }
 }

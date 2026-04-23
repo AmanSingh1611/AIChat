@@ -72,5 +72,5 @@ struct CategoryListView: View {
 #Preview {
     @Previewable @State var path: [NavigationPathOption] = []
     CategoryListView(path: $path)
-        .environment(AvatarManager(service: MockAvatarService()))
+        .environment(AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistance()))
 }

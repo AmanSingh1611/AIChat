@@ -1,5 +1,5 @@
 //
-//  MockAvatarService.swift
+//  MockRemoteAvatarService.swift
 //  AIChat
 //
 //  Created by Aman on 22/04/26.
@@ -7,7 +7,11 @@
 
 import SwiftUI
 
-struct MockAvatarService: AvatarService {
+struct MockRemoteAvatarService: RemoteAvatarService {
+    func getAvatar(id: String) async throws -> AvatarModel {
+        AvatarModel.mock
+    }
+    
     func getAvatarForAuthor(userId: String) async throws -> [AvatarModel] {
         AvatarModel.mocks.filter { avatar in
             avatar.authorId == userId

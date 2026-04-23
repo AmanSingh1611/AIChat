@@ -9,7 +9,7 @@ import FirebaseFirestore
 import SwiftfulFirestore
 import Appwrite
 
-struct FirebaseAvatarService: AvatarService {
+struct FirebaseAvatarService: RemoteAvatarService {
     func getAvatarForAuthor(userId: String) async throws -> [AvatarModel] {
         try await collection
             .whereField(AvatarModel.CodingKeys.authorId.rawValue, isEqualTo: userId)
@@ -59,5 +59,9 @@ struct FirebaseAvatarService: AvatarService {
         // Upload the avatar
         try collection.document(avatar.avatarId).setData(from: avatar, merge: true)
         
+    }
+    
+    func getAvatar(id: String) async throws -> AvatarModel {
+        try await collection.getDocument(id: id)
     }
 }

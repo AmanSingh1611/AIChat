@@ -53,8 +53,8 @@ struct FirebaseAvatarService: RemoteAvatarService {
         // Upload Image
         let path = "avatar/\(avatar.avatarId)"
         let client = Client()
-            .setEndpoint("https://nyc.cloud.appwrite.io/v1")
-            .setProject("69e9b65200207791909e")
+            .setEndpoint(AppwriteConstants.appwriteURL)
+            .setProject(AppwriteConstants.appwriteProjectId)
         
         let uploader = AppwriteImageUploadService(client: client)
         

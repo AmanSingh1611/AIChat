@@ -186,15 +186,15 @@ struct ExploreView: View {
 
 #Preview("Has Data") {
     ExploreView()
-        .environment(AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistance()))
+        .environment(AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistence()))
 }
 
 #Preview("No Data") {
     ExploreView()
-        .environment(AvatarManager(service: MockRemoteAvatarService(avatars: []), local: MockLocalAvatarPersistance()))
+        .environment(AvatarManager(service: MockRemoteAvatarService(avatars: []), local: MockLocalAvatarPersistence()))
 }
 
 #Preview("Slow Data") {
     ExploreView()
-        .environment(AvatarManager(service: MockRemoteAvatarService(delay: 5), local: MockLocalAvatarPersistance()))
+        .environment(AvatarManager(service: MockRemoteAvatarService(delay: 5), local: MockLocalAvatarPersistence()))
 }

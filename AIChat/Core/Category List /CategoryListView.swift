@@ -79,23 +79,23 @@ struct CategoryListView: View {
 #Preview("Has Data") {
     @Previewable @State var path: [NavigationPathOption] = []
     CategoryListView(path: $path)
-        .environment(AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistance()))
+        .environment(AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistence()))
 }
 
 #Preview("No Data") {
     @Previewable @State var path: [NavigationPathOption] = []
     CategoryListView(path: $path)
-        .environment(AvatarManager(service: MockRemoteAvatarService(avatars: []), local: MockLocalAvatarPersistance()))
+        .environment(AvatarManager(service: MockRemoteAvatarService(avatars: []), local: MockLocalAvatarPersistence()))
 }
 
 #Preview("Slow Data") {
     @Previewable @State var path: [NavigationPathOption] = []
     CategoryListView(path: $path)
-        .environment(AvatarManager(service: MockRemoteAvatarService(delay: 10), local: MockLocalAvatarPersistance()))
+        .environment(AvatarManager(service: MockRemoteAvatarService(delay: 10), local: MockLocalAvatarPersistence()))
 }
 
 #Preview("Error Loading Data") {
     @Previewable @State var path: [NavigationPathOption] = []
     CategoryListView(path: $path)
-        .environment(AvatarManager(service: MockRemoteAvatarService(delay: 4, showError: true), local: MockLocalAvatarPersistance()))
+        .environment(AvatarManager(service: MockRemoteAvatarService(delay: 4, showError: true), local: MockLocalAvatarPersistence()))
 }

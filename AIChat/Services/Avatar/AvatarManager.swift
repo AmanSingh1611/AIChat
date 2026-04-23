@@ -11,9 +11,9 @@ import SwiftUI
 @Observable
 class AvatarManager {
     private let remote: RemoteAvatarService
-    private let local: LocalAvatarPersistance
+    private let local: LocalAvatarPersistence
     
-    init(service: RemoteAvatarService, local: LocalAvatarPersistance) {
+    init(service: RemoteAvatarService, local: LocalAvatarPersistence) {
         self.remote = service
         self.local  = local
     }

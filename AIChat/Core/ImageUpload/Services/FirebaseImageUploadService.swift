@@ -8,10 +8,6 @@
 import SwiftUI
 import FirebaseStorage
 
-protocol ImageUploadService {
-    func uploadImage(image: UIImage, path: String) async throws -> URL
-}
-
 struct FirebaseImageUploadService: ImageUploadService {
     func uploadImage(image: UIImage, path: String) async throws -> URL {
         guard let data = image.jpegData(compressionQuality: 1) else {

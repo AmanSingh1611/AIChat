@@ -7,6 +7,7 @@
 
 import FirebaseFirestore
 import SwiftfulFirestore
+import Appwrite
 
 struct FirebaseAvatarService: AvatarService {
     func getAvatarForAuthor(userId: String) async throws -> [AvatarModel] {
@@ -43,7 +44,13 @@ struct FirebaseAvatarService: AvatarService {
     func createAvatar(avatar: AvatarModel, image: UIImage) async throws {
         // Upload Image
         let path = "avatar/\(avatar.avatarId)"
-        let url = try await MockImageUploadService().uploadImage(image: image, path: path)
+        let client = Client()
+            .setEndpoint("https://nyc.cloud.appwrite.io/v1")
+            .setProject("69e9b65200207791909e")
+        
+        let uploader = AppwriteImageUploadService(client: client)
+        
+        let url = try await uploader.uploadImage(image: image, path: path)
         
         // Upload the avatar image name
         var avatar = avatar

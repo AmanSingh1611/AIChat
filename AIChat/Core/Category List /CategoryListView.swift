@@ -28,11 +28,18 @@ struct CategoryListView: View {
             )
             .removeListRowFormatting()
             
-            if avatars.isEmpty && isLoading {
+            if isLoading {
                 ProgressView()
                     .padding(40)
                     .frame(maxWidth: .infinity)
                     .removeListRowFormatting()
+            } else if avatars.isEmpty {
+                Text("No avatars found")
+                    .foregroundStyle(.secondary)
+                    .padding(40)
+                    .foregroundStyle(.secondary)
+                    .removeListRowFormatting()
+                    
             } else {
                 ForEach(avatars, id: \.self) { avatar in
                     CustomListCellView(
@@ -69,8 +76,26 @@ struct CategoryListView: View {
     }
 }
 
-#Preview {
+#Preview("Has Data") {
     @Previewable @State var path: [NavigationPathOption] = []
     CategoryListView(path: $path)
         .environment(AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistance()))
+}
+
+#Preview("No Data") {
+    @Previewable @State var path: [NavigationPathOption] = []
+    CategoryListView(path: $path)
+        .environment(AvatarManager(service: MockRemoteAvatarService(avatars: []), local: MockLocalAvatarPersistance()))
+}
+
+#Preview("Slow Data") {
+    @Previewable @State var path: [NavigationPathOption] = []
+    CategoryListView(path: $path)
+        .environment(AvatarManager(service: MockRemoteAvatarService(delay: 10), local: MockLocalAvatarPersistance()))
+}
+
+#Preview("Error Loading Data") {
+    @Previewable @State var path: [NavigationPathOption] = []
+    CategoryListView(path: $path)
+        .environment(AvatarManager(service: MockRemoteAvatarService(delay: 4, showError: true), local: MockLocalAvatarPersistance()))
 }

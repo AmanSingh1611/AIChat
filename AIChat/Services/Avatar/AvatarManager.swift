@@ -22,8 +22,9 @@ class AvatarManager {
         try local.getRecentAvatars()
     }
     
-    func addRecentAvatar(avatar: AvatarModel) throws {
+    func addRecentAvatar(avatar: AvatarModel) async throws {
         try local.addRecentAvatar(avatar: avatar)
+        try await remote.incrementAvatarClickCount(avatarId: avatar.avatarId)
     }
     
     func createAvatar(avatar: AvatarModel, image: UIImage) async throws {

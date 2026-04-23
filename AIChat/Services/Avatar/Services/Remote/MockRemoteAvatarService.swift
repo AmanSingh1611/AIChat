@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct MockRemoteAvatarService: RemoteAvatarService {
+    func incrementAvatarClickCount(avatarId: String) async throws {
+        
+    }
+    
     func getAvatar(id: String) async throws -> AvatarModel {
         AvatarModel.mock
     }

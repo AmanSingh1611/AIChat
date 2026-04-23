@@ -187,7 +187,8 @@ struct CreateAvatarView: View {
                     characterLocation: characterLocation,
                     profileImageName: nil,
                     authorId: authorId,
-                    dateCreated: .now
+                    dateCreated: .now,
+                    clickCount: 0
                 )
                 
                 try await avatarManager.createAvatar(avatar: avatar, image: generatedImage)

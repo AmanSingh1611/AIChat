@@ -209,6 +209,6 @@ struct ChatView: View {
     NavigationStack {
         ChatView()
             .environment(AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistence()))
-            .environment(AIManager(service: MockAIService()))
+            .environment(AIManager(imageGenerationService: MockAIService(), textGenerationService: MockAIService()))
     }
 }

@@ -206,7 +206,7 @@ struct CreateAvatarView: View {
 
 #Preview {
     CreateAvatarView()
-        .environment(AIManager(service: MockAIService()))
+        .environment(AIManager(imageGenerationService: MockAIService(), textGenerationService: MockAIService()))
         .environment(AuthManager(service: MockAuthService(user: .mock())))
         .environment(AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistence()))
 }

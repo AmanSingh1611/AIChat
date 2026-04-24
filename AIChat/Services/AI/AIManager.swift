@@ -12,17 +12,19 @@ import SwiftUI
 @Observable
 class AIManager {
     
-    private let service: AIService
+    private let imageGenerationService: AIImageGenerationService
+    private let textGenerationService: AITextGenerationService
     
-    init(service: AIService) {
-        self.service = service
+    init(imageGenerationService: AIImageGenerationService, textGenerationService: AITextGenerationService) {
+        self.imageGenerationService = imageGenerationService
+        self.textGenerationService = textGenerationService
     }
     
     func generateImage(input: String) async throws -> UIImage {
-        try await service.generateImage(input: input)
+        try await imageGenerationService.generateImage(input: input)
     }
     
     func generateText(chats: [AIChatModel]) async throws -> AIChatModel {
-        try await service.generateText(chats: chats)
+        try await textGenerationService.generateText(chats: chats)
     }
 }

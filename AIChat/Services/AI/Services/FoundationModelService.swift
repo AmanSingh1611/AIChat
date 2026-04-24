@@ -7,14 +7,8 @@
 import FoundationModels
 import SwiftUI
 
-final class FoundationModelService: AIService {
+final class FoundationModelService: AITextGenerationService {
     private var session: LanguageModelSession?
-    
-    func generateImage(input: String) async throws -> UIImage {
-        try await Task.sleep(for: .seconds(3))
-        let mockImages = (1...6).compactMap { UIImage(named: "MockAI/\($0)") }
-        return mockImages.randomElement()!
-    }
     
     func generateText(chats: [AIChatModel]) async throws -> AIChatModel {
         guard SystemLanguageModel.default.isAvailable else {

@@ -1,12 +1,15 @@
 //
-//  AIService.swift
+//  AIServices.swift
 //  AIChat
 //
-//  Created by Aman on 16/04/26.
+//  Created by Aman on 24/04/26.
 //
 import SwiftUI
 
-protocol AIService: Sendable {
+protocol AIImageGenerationService {
     func generateImage(input: String) async throws -> UIImage
+}
+
+protocol AITextGenerationService {
     func generateText(chats: [AIChatModel]) async throws -> AIChatModel
 }

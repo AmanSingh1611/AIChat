@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-struct MockAIService: AIService {
+struct MockAIService: AIImageGenerationService, AITextGenerationService {
     func generateText(chats: [AIChatModel]) async throws -> AIChatModel {
         try? await Task.sleep(for: .seconds(1))
         return AIChatModel(role: .assistant, content: "Returned text from mock ai")

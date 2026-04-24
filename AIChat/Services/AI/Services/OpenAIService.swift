@@ -7,7 +7,7 @@
 import OpenAI
 import SwiftUI
 
-struct OpenAIService: AIService {
+struct OpenAIService: AITextGenerationService, AIImageGenerationService {
     var openAI: OpenAI {
         OpenAI(apiToken: "")
     }

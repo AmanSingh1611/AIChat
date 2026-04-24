@@ -15,4 +15,6 @@ protocol RemoteAvatarService {
     func getAvatarForAuthor(userId: String) async throws -> [AvatarModel]
     func getAvatar(id: String) async throws -> AvatarModel
     func incrementAvatarClickCount(avatarId: String) async throws
+    func removeAuthorIdFromAllUserAvatars(userId: String) async throws
+    func removeAuthorIdFromAvatar(avatarId: String) async throws
 }

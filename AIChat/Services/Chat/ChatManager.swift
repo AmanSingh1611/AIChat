@@ -18,4 +18,8 @@ class ChatManager {
     func createNewChat(chat: ChatModel) async throws {
         try await service.createNewChat(chat: chat)
     }
+    
+    func addChatMessage(chatId: String, message: ChatMessageModel) async throws {
+        try await service.addChatMessage(chatId: chatId, message: message)
+    }
 }

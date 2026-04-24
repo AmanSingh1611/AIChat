@@ -85,7 +85,7 @@ struct AvatarModel: Hashable, Codable, StringIdentifiable {
     static var mocks: [AvatarModel] {
         return [
             AvatarModel(
-                avatarId: UUID().uuidString,
+                avatarId: "mock_ava_1",
                 name: "Alpha",
                 characterOption: .man,
                 characterAction: .smiling,
@@ -95,7 +95,7 @@ struct AvatarModel: Hashable, Codable, StringIdentifiable {
                 dateCreated: Date()
             ),
             AvatarModel(
-                avatarId: UUID().uuidString,
+                avatarId: "mock_ava_2",
                 name: "Beta",
                 characterOption: .woman,
                 characterAction: .working,
@@ -105,7 +105,7 @@ struct AvatarModel: Hashable, Codable, StringIdentifiable {
                 dateCreated: Date()
             ),
             AvatarModel(
-                avatarId: UUID().uuidString,
+                avatarId: "mock_ava_3",
                 name: "Gama",
                 characterOption: .alien,
                 characterAction: .walking,
@@ -115,7 +115,7 @@ struct AvatarModel: Hashable, Codable, StringIdentifiable {
                 dateCreated: Date()
             ),
             AvatarModel(
-                avatarId: UUID().uuidString,
+                avatarId: "mock_ava_4",
                 name: "Delta",
                 characterOption: .cat,
                 characterAction: .relaxing,

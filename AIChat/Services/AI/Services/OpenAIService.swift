@@ -68,11 +68,11 @@ struct OpenAIService: AITextGenerationService, AIImageGenerationService {
 
 import FoundationModels
 
-enum AIChatRole {
+enum AIChatRole: String, Codable {
     case system, user, assistant
 }
 
-struct AIChatModel {
+struct AIChatModel: Codable {
     let role: AIChatRole
     let message: String
     

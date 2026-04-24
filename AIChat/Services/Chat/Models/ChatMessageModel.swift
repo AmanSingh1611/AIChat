@@ -6,7 +6,7 @@
 //
 import Foundation
 
-struct ChatMessageModel: Identifiable {
+struct ChatMessageModel: Identifiable, Codable {
     
     let id: String
     let chatId: String
@@ -29,6 +29,15 @@ struct ChatMessageModel: Identifiable {
         self.content = content
         self.seenByIds = seenByIds
         self.dateCreated = dateCreated
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case chatId = "chat_id"
+        case authorId = "author_id"
+        case content
+        case seenByIds = "seen_by_ids"
+        case dateCreated = "date_created"
     }
     
     static var mock: ChatMessageModel {
@@ -70,7 +79,7 @@ struct ChatMessageModel: Identifiable {
             ChatMessageModel(
                 id: "msg_1",
                 chatId: "1",
-                authorId: "user_1",
+                authorId: UserAuthInfo.mock().uid,
                 content: AIChatModel(role: .user, content: "Hey, how are you?"),
                 seenByIds: ["user_2"],
                 dateCreated: now.addTimeInterval(minutes: -50)
@@ -79,7 +88,7 @@ struct ChatMessageModel: Identifiable {
             ChatMessageModel(
                 id: "msg_2",
                 chatId: "1",
-                authorId: "user_2",
+                authorId: AvatarModel.mock.avatarId,
                 content: AIChatModel(role: .assistant, content: "I'm good! What about you?"),
                 seenByIds: ["user_1"],
                 dateCreated: now.addTimeInterval(minutes: -40)
@@ -88,7 +97,7 @@ struct ChatMessageModel: Identifiable {
             ChatMessageModel(
                 id: "msg_3",
                 chatId: "1",
-                authorId: "user_1",
+                authorId: UserAuthInfo.mock().uid,
                 content: AIChatModel(role: .user, content: "Doing great. Working on the new feature."),
                 seenByIds: ["user_2"],
                 dateCreated: now.addTimeInterval(minutes: -25)
@@ -97,7 +106,7 @@ struct ChatMessageModel: Identifiable {
             ChatMessageModel(
                 id: "msg_4",
                 chatId: "1",
-                authorId: "user_2",
+                authorId: AvatarModel.mock.avatarId,
                 content: AIChatModel(role: .assistant, content: "Nice! Let me know if you need help."),
                 seenByIds: ["user_1"],
                 dateCreated: now.addTimeInterval(minutes: -10)

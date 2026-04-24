@@ -19,6 +19,7 @@ struct AIChatApp: App {
                 .environment(delegate.dependencies.userManager)
                 .environment(delegate.dependencies.aiManager)
                 .environment(delegate.dependencies.avatarManager)
+                .environment(delegate.dependencies.chatManager)
         }
     }
 }
@@ -40,12 +41,14 @@ struct Dependencies {
     var userManager: UserManager
     var aiManager: AIManager
     var avatarManager: AvatarManager
+    var chatManager: ChatManager
     
     init() {
         self.authManager = AuthManager(service: FirebaseAuthService())
         self.userManager = UserManager(services: ProductionUserServices())
         self.aiManager = AIManager(imageGenerationService: AppleAIService(), textGenerationService: FoundationModelService())
         self.avatarManager = AvatarManager(service: FirebaseAvatarService(imageUploadService: AppwriteImageUploadService()), local: SwiftDataLocalAvatarPersistence())
+        self.chatManager = ChatManager(service: FirebaseChatService())
     }
 }
 
@@ -56,6 +59,7 @@ extension View {
             .environment(AuthManager(service: MockAuthService(user: isSignedIn ? .mock() : nil)))
             .environment(AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistence()))
             .environment(UserManager(services: MockUserServices(user: isSignedIn ? .mock : nil)))
+            .environment(ChatManager(service: MockChatService()))
             .environment(AppState())
     }
 }

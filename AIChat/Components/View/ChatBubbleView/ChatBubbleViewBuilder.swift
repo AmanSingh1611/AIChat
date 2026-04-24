@@ -10,13 +10,14 @@ import SwiftUI
 struct ChatBubbleViewBuilder: View {
     var message: ChatMessageModel = .mock
     var isCurrentUser: Bool = false
+    var currentUserProfileColor: Color = .accentColor
     var imageName: String?
     var onImagePressed: (() -> Void)?
     
     var body: some View {
         ChatBubbleView(
             textColor: isCurrentUser ? .white : .primary,
-            backgroundColor: isCurrentUser ? .accent : Color(uiColor: .systemGray6),
+            backgroundColor: isCurrentUser ? currentUserProfileColor : Color(uiColor: .systemGray6),
             text: message.content?.message ?? "",
             imageName: imageName,
             showImage: !isCurrentUser,
@@ -52,7 +53,8 @@ struct ChatBubbleViewBuilder: View {
                     seenByIds: nil,
                     dateCreated: .now
                 ),
-                isCurrentUser: true
+                isCurrentUser: true,
+                currentUserProfileColor: .blue
             )
             
         }

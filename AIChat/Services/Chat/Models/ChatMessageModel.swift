@@ -41,6 +41,28 @@ struct ChatMessageModel: Identifiable {
         return seenByIds.contains(userId)
     }
     
+    static func newUserMessage(chatId: String, userId: String, message: AIChatModel) -> Self {
+        ChatMessageModel(
+            id: UUID().uuidString,
+            chatId: chatId,
+            authorId: userId,
+            content: message,
+            seenByIds: [userId],
+            dateCreated: .now
+        )
+    }
+    
+    static func newAIMessage(chatId: String, avatarId: String, message: AIChatModel) -> Self {
+        ChatMessageModel(
+            id: UUID().uuidString,
+            chatId: chatId,
+            authorId: avatarId,
+            content: message,
+            seenByIds: [],
+            dateCreated: .now
+        )
+    }
+    
     static var mocks: [ChatMessageModel] {
         let now = Date()
         

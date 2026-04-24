@@ -17,7 +17,7 @@ struct ChatBubbleViewBuilder: View {
         ChatBubbleView(
             textColor: isCurrentUser ? .white : .primary,
             backgroundColor: isCurrentUser ? .accent : Color(uiColor: .systemGray6),
-            text: message.content ?? "",
+            text: message.content?.message ?? "",
             imageName: imageName,
             showImage: !isCurrentUser,
             onImagePressed: onImagePressed
@@ -38,7 +38,7 @@ struct ChatBubbleViewBuilder: View {
                     id: UUID().uuidString,
                     chatId: UUID().uuidString,
                     authorId: UUID().uuidString,
-                    content: "This is a long text that goes to multiple line and keeps on goin to multiple line goes on and on and on .",
+                    content: AIChatModel(role: .user, content: "This is a long text that goes to multiple line and keeps on goin to multiple line goes on and on and on ."),
                     seenByIds: nil,
                     dateCreated: .now
                 )
@@ -48,7 +48,7 @@ struct ChatBubbleViewBuilder: View {
                     id: UUID().uuidString,
                     chatId: UUID().uuidString,
                     authorId: UUID().uuidString,
-                    content: "This is a long text that goes to multiple line and keeps on goin to multiple line goes on and on and on .",
+                    content: AIChatModel(role: .user, content: "This is a long text that goes to multiple line and keeps on goin to multiple line goes on and on and on ."),
                     seenByIds: nil,
                     dateCreated: .now
                 ),

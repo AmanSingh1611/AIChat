@@ -4,12 +4,14 @@
 //
 //  Created by Aman on 22/04/26.
 //
-
 import FirebaseFirestore
 import SwiftfulFirestore
-import Appwrite
+import UIKit
 
 struct FirebaseAvatarService: RemoteAvatarService {
+    
+    let imageUploadService: ImageUploadService
+    
     func incrementAvatarClickCount(avatarId: String) async throws {
         try await collection.document(avatarId).updateData([
             AvatarModel.CodingKeys.clickCount.rawValue: FieldValue.increment(Int64(1))
@@ -50,23 +52,13 @@ struct FirebaseAvatarService: RemoteAvatarService {
     }
     
     func createAvatar(avatar: AvatarModel, image: UIImage) async throws {
-        // Upload Image
         let path = "avatar/\(avatar.avatarId)"
-        let client = Client()
-            .setEndpoint(AppwriteConstants.appwriteURL)
-            .setProject(AppwriteConstants.appwriteProjectId)
+        let url = try await imageUploadService.uploadImage(image: image, path: path)
         
-        let uploader = AppwriteImageUploadService(client: client)
-        
-        let url = try await uploader.uploadImage(image: image, path: path)
-        
-        // Upload the avatar image name
         var avatar = avatar
         avatar.updateProfileImageName(imageName: url.absoluteString)
         
-        // Upload the avatar
         try collection.document(avatar.avatarId).setData(from: avatar, merge: true)
-        
     }
     
     func removeAuthorIdFromAvatar(avatarId: String) async throws {

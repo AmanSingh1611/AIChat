@@ -15,7 +15,10 @@ struct AppwriteImageUploadService: ImageUploadService {
     private let bucketId = AppwriteConstants.appwriteBucketId
     private let projectId = AppwriteConstants.appwriteProjectId
     
-    init(client: Client) {
+    init(client: Client = Client()
+        .setEndpoint(AppwriteConstants.appwriteURL)
+        .setProject(AppwriteConstants.appwriteProjectId)
+    ) {
         self.client = client
         self.storage = Storage(client)
     }

@@ -11,7 +11,7 @@ struct ChatMessageModel: Identifiable {
     let id: String
     let chatId: String
     let authorId: String?
-    let content: String?
+    let content: AIChatModel?
     let seenByIds: [String]?
     let dateCreated: Date?
     
@@ -19,7 +19,7 @@ struct ChatMessageModel: Identifiable {
         id: String,
         chatId: String,
         authorId: String? = nil,
-        content: String? = nil,
+        content: AIChatModel? = nil,
         seenByIds: [String]? = nil,
         dateCreated: Date? = nil
     ) {
@@ -49,7 +49,7 @@ struct ChatMessageModel: Identifiable {
                 id: "msg_1",
                 chatId: "1",
                 authorId: "user_1",
-                content: "Hey, how are you?",
+                content: AIChatModel(role: .user, content: "Hey, how are you?"),
                 seenByIds: ["user_2"],
                 dateCreated: now.addTimeInterval(minutes: -50)
             ),
@@ -58,7 +58,7 @@ struct ChatMessageModel: Identifiable {
                 id: "msg_2",
                 chatId: "1",
                 authorId: "user_2",
-                content: "I'm good! What about you?",
+                content: AIChatModel(role: .assistant, content: "I'm good! What about you?"),
                 seenByIds: ["user_1"],
                 dateCreated: now.addTimeInterval(minutes: -40)
             ),
@@ -67,7 +67,7 @@ struct ChatMessageModel: Identifiable {
                 id: "msg_3",
                 chatId: "1",
                 authorId: "user_1",
-                content: "Doing great. Working on the new feature.",
+                content: AIChatModel(role: .user, content: "Doing great. Working on the new feature."),
                 seenByIds: ["user_2"],
                 dateCreated: now.addTimeInterval(minutes: -25)
             ),
@@ -76,7 +76,7 @@ struct ChatMessageModel: Identifiable {
                 id: "msg_4",
                 chatId: "1",
                 authorId: "user_2",
-                content: "Nice! Let me know if you need help.",
+                content: AIChatModel(role: .assistant, content: "Nice! Let me know if you need help."),
                 seenByIds: ["user_1"],
                 dateCreated: now.addTimeInterval(minutes: -10)
             )

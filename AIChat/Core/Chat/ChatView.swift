@@ -149,6 +149,11 @@ struct ChatView: View {
         ScrollView {
             LazyVStack(spacing: 24) {
                 ForEach(chatMessages) { message in
+
+                    if messageIsDelayed(message: message) {
+                        timeStampView(date: message.dateCreatedCalculated)
+                    }
+                     
                     let isCurrentUser = message.authorId == authManager.userAuth?.uid
                     
                     ChatBubbleViewBuilder(
@@ -158,6 +163,9 @@ struct ChatView: View {
                         imageName: isCurrentUser ? nil : avatar?.profileImageName,
                         onImagePressed: onAvatarImagePressed
                     )
+                    .onAppear {
+                        onMessageDidAppear(message: message)
+                    }
                     .id(message.id)
                 }
             }
@@ -170,6 +178,46 @@ struct ChatView: View {
         .animation(.default, value: chatMessages.count)
         .animation(.default, value: scrollPosition)
         
+    }
+    
+    private func onMessageDidAppear(message: ChatMessageModel) {
+        Task {
+            do {
+                let userId = try authManager.getAuthId()
+                let chatId = try getChatId()
+                guard !message.hasBeenSeenBy(userId: userId) else {
+                    return
+                }
+                try await chatManager.markChatMessageAsSeen(chatId: chatId, messageId: message.id, userId: userId)
+            } catch {
+                print("Failed to mark as seen.")
+            }
+        }
+    }
+    
+    private func messageIsDelayed(message: ChatMessageModel) -> Bool {
+        guard let index = chatMessages.firstIndex(where: { $0.id == message.id }) else {
+            return false
+        }
+        
+        if index == 0 {
+            return true
+        }
+        
+        let currentDate = chatMessages[index].dateCreatedCalculated
+        let previousDate = chatMessages[index - 1].dateCreatedCalculated
+        
+        // Threshold = 60 seconds * 45 minutes
+        let threshold: TimeInterval = 60 * 45
+        return currentDate.timeIntervalSince(previousDate) > threshold
+    }
+    
+    private func timeStampView(date: Date) -> some View {
+        Text(
+            "\(date.formatted(date: .abbreviated, time: .omitted)) • \(date.formatted(date: .omitted, time: .shortened))"
+        )
+        .foregroundStyle(.secondary)
+        .font(.callout)
     }
     
     private var textFieldSection: some View {

@@ -9,6 +9,10 @@ import Combine
 
 @MainActor
 class MockChatService: ChatService {
+    func markChatMessageAsSeen(chatId: String, messageId: String, userId: String) async throws {
+        
+    }
+    
     
     let chats: [ChatModel]
     @Published private var messages: [ChatMessageModel]

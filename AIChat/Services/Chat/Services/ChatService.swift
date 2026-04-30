@@ -17,4 +17,5 @@ protocol ChatService: Sendable {
     func deleteChat(chatId: String) async throws
     func deleteAllChatsForUser(userId: String) async throws
     func reportChat(report: ChatReportModel) async throws
+    func markChatMessageAsSeen(chatId: String, messageId: String, userId: String) async throws
 }

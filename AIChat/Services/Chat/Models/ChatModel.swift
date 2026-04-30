@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import IdentifiableByString
 
-struct ChatModel: Identifiable, Codable {
+struct ChatModel: Identifiable, Codable, StringIdentifiable {
     
     let id: String
     let userId: String
@@ -19,9 +20,13 @@ struct ChatModel: Identifiable, Codable {
         mocks.first!
     }
     
+    static func chatId(userId: String, avatarId: String) -> String {
+        return "\(userId)_\(avatarId)"
+    }
+    
     static func new(userId: String, avatarId: String) -> Self {
         ChatModel(
-            id: "\(userId)_\(avatarId)",
+            id: chatId(userId: userId, avatarId: avatarId),
             userId: userId,
             avatarId: avatarId,
             dateCreated: .now,

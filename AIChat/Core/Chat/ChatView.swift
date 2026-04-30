@@ -14,7 +14,7 @@ struct ChatView: View {
     @Environment(AIManager.self) private var aiManager
     @Environment(ChatManager.self) private var chatManager
     
-    @State private var chatMessages: [ChatMessageModel] = ChatMessageModel.mocks
+    @State private var chatMessages: [ChatMessageModel] = []
     @State private var avatar: AvatarModel?
     @State private var currentUser: UserModel?
     @State private var chat: ChatModel?
@@ -24,6 +24,7 @@ struct ChatView: View {
     @State private var showChatSettings: AnyAppAlert?
     @State private var showProfileModal: Bool = false
     @State private var isGeneratingResponse: Bool = false
+    @State private var messageListener: Task<Void, Never>?
     
     var avatarId: String = AvatarModel.mock.avatarId
     
@@ -60,8 +61,59 @@ struct ChatView: View {
         .task {
             await loadAvatar()
         }
+        .task {
+            await loadChat()
+            await listenForChatMessages()
+        }
         .onAppear {
             loadCurrentUser()
+        }
+        .onDisappear {
+            messageListener?.cancel()
+        }
+    }
+    
+    private func loadChat() async {
+        do {
+            let userId = try authManager.getAuthId()
+            chat = try await chatManager.getChat(userId: userId, avatarId: avatarId)
+            print("Success loading chat.")
+        } catch {
+            print("Error loading chat.")
+        }
+    }
+    
+    private func getChatId() throws -> String {
+        guard let chat else {
+            throw ChatViewError.noChat
+        }
+        return chat.id
+    }
+    
+    func listenForChatMessages() async {
+        messageListener?.cancel()
+        
+        messageListener = Task {
+            do {
+                let chatId = try self.getChatId()
+                
+                for try await value in self.chatManager.streamChatMessages(chatId: chatId) {
+                    if Task.isCancelled { break }
+                    
+                    let sortedMessages = value.sorted {
+                        $0.dateCreatedCalculated < $1.dateCreatedCalculated
+                    }
+                    
+                    await MainActor.run {
+                        self.chatMessages = sortedMessages
+                        self.scrollPosition = sortedMessages.last?.id
+                    }
+                }
+            } catch is CancellationError {
+                print("Chat message listener cancelled")
+            } catch {
+                print("Chat view failed to attach listener: \(error)")
+            }
         }
     }
     
@@ -184,26 +236,28 @@ struct ChatView: View {
                 
                 // Upload user chat
                 try await chatManager.addChatMessage(chatId: chat.id, message: message)
-                chatMessages.append(message)
                 
                 // Clear text field and scroll to bottom
-                scrollPosition = message.id
                 textMessage = ""
                 
                 // Generate AI response
                 isGeneratingResponse = true
-                let aiChats = chatMessages.compactMap({ $0.content })
+                var aiChats = chatMessages.compactMap({ $0.content })
+                if let avatarDescription = avatar?.description {
+                    // Description "A cat smiliing in the park"
+                    let systemMessage = AIChatModel(
+                        role: .system,
+                        content: "You are a \(avatarDescription) with the inteligence of an AI. We are having a very casual conversation. You are my friend."
+                    )
+                    aiChats.insert(systemMessage, at: 0)
+                }
                 let response = try await aiManager.generateText(chats: aiChats)
                 
-                
-                //Create AI Chat
+                // Create AI Chat
                 let newAIMessage = ChatMessageModel.newAIMessage(chatId: chat.id, avatarId: avatarId, message: response)
                 
                 // Upload AI Chat
                 try await chatManager.addChatMessage(chatId: chat.id, message: newAIMessage)
-                chatMessages.append(newAIMessage)
-                scrollPosition = newAIMessage.id
-                
             } catch {
                 showAlert = AnyAppAlert(error: error)
             }
@@ -218,6 +272,11 @@ struct ChatView: View {
     private func createNewChat(userId: String) async throws -> ChatModel {
         let newChat = ChatModel.new(userId: userId, avatarId: avatarId)
         try await chatManager.createNewChat(chat: newChat)
+        defer {
+            Task {
+                await listenForChatMessages()
+            }
+        }
         return newChat
     }
     

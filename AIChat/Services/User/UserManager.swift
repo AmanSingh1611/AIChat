@@ -28,11 +28,11 @@ class UserManager {
         
         let user = UserModel(userAuth: userAuth, creationVersion: creationVersion)
         try await remote.saveUser(user: user)
-        addCurrentUserListner(userId: user.userId)
+        addCurrentUserListener(userId: user.userId)
         
     }
     
-    func addCurrentUserListner(userId: String) {
+    func addCurrentUserListener(userId: String) {
         listenerTask?.cancel()
 
         listenerTask = Task {

@@ -22,4 +22,12 @@ class ChatManager {
     func addChatMessage(chatId: String, message: ChatMessageModel) async throws {
         try await service.addChatMessage(chatId: chatId, message: message)
     }
+    
+    func getChat(userId: String, avatarId: String) async throws -> ChatModel? {
+        try await service.getChat(userId: userId, avatarId: avatarId)
+    }
+    
+    func streamChatMessages(chatId: String) -> AsyncThrowingStream<[ChatMessageModel], any Error> {
+        service.streamChatMessages(chatId: chatId)
+    }
 }

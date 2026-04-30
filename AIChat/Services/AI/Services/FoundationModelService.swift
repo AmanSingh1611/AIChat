@@ -8,27 +8,35 @@ import FoundationModels
 import SwiftUI
 
 final class FoundationModelService: AITextGenerationService {
-    private var session: LanguageModelSession?
+    
+    private var sessions: [String: LanguageModelSession] = [:]
     
     func generateText(chats: [AIChatModel]) async throws -> AIChatModel {
+        
         guard SystemLanguageModel.default.isAvailable else {
             throw FoundationModelError.modelUnavailable
         }
         
-        if session == nil {
-            let systemPrompt = chats
-                .filter { $0.role == .system }
-                .map { $0.message }
-                .joined(separator: "\n")
-            
-            session = LanguageModelSession(instructions: systemPrompt)
+        let systemPrompt = chats
+            .filter { $0.role == .system }
+            .map { $0.message }
+            .joined(separator: "\n")
+        
+        let sessionKey = systemPrompt.isEmpty ? "default" : systemPrompt
+        
+        if sessions[sessionKey] == nil {
+            sessions[sessionKey] = LanguageModelSession(instructions: systemPrompt)
+        }
+        
+        guard let session = sessions[sessionKey] else {
+            throw FoundationModelError.modelUnavailable
         }
         
         guard let userMessage = chats.last(where: { $0.role == .user })?.message else {
             throw FoundationModelError.noUserMessage
         }
         
-        let response = try await session!.respond(to: userMessage)
+        let response = try await session.respond(to: userMessage)
         return AIChatModel(role: .assistant, content: response.content)
     }
     

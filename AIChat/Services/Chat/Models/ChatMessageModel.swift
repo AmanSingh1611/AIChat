@@ -31,6 +31,10 @@ struct ChatMessageModel: Identifiable, Codable {
         self.dateCreated = dateCreated
     }
     
+    var dateCreatedCalculated : Date {
+        dateCreated ?? .distantPast
+    }
+    
     enum CodingKeys: String, CodingKey {
         case id
         case chatId = "chat_id"

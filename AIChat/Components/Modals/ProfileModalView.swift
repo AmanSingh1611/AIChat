@@ -8,20 +8,35 @@
 import SwiftUI
 
 struct ProfileModalView: View {
+    
     var imageName: String? = Constants.randomImage
     var title: String? = "Alpha"
     var subtitle: String? = "Alien"
-    var headline: String? = "An alien in the park"
+    var headline: String? = "An alien in the park."
     var onXMarkPressed: () -> Void = { }
     
     var body: some View {
         VStack(spacing: 0) {
-            if let imageName {
-                ImageLoaderView(
-                    urlString: imageName,
-                    forceTransitionAnimation: true
-                )
-                .aspectRatio(1, contentMode: .fit)
+            ZStack(alignment: .topTrailing) {
+                VStack {
+                    if let imageName {
+                        ImageLoaderView(
+                            urlString: imageName,
+                            forceTransitionAnimation: true
+                        )
+                        .aspectRatio(1, contentMode: .fit)
+                    }
+                }
+                
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title)
+                    .foregroundStyle(Color.black)
+                    .padding(4)
+                    .tappablebackground()
+                    .anyButton {
+                        onXMarkPressed()
+                    }
+                    .padding(8)
             }
             
             VStack(alignment: .leading, spacing: 4) {
@@ -30,13 +45,11 @@ struct ProfileModalView: View {
                         .font(.title)
                         .fontWeight(.semibold)
                 }
-                
                 if let subtitle {
                     Text(subtitle)
                         .font(.title3)
                         .foregroundStyle(.secondary)
                 }
-                
                 if let headline {
                     Text(headline)
                         .font(.subheadline)
@@ -48,24 +61,22 @@ struct ProfileModalView: View {
         }
         .background(.thinMaterial)
         .cornerRadius(16)
-        .overlay(alignment: .topTrailing) {
-            Image(systemName: "xmark.circle.fill")
-                .font(.title)
-                .padding(4)
-                .tappablebackground()
-                .anyButton {
-                    onXMarkPressed()
-                }
-                .padding(8)
-        }
     }
 }
 
-#Preview {
+#Preview("Modal w/ Image") {
     ZStack {
         Color.gray.ignoresSafeArea()
         
         ProfileModalView()
+            .padding(40)
+    }
+}
+#Preview("Modal w/out Image") {
+    ZStack {
+        Color.gray.ignoresSafeArea()
+        
+        ProfileModalView(imageName: nil)
             .padding(40)
     }
 }

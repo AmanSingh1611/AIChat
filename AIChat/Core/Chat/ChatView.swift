@@ -17,7 +17,7 @@ struct ChatView: View {
     @State private var chatMessages: [ChatMessageModel] = []
     @State private var avatar: AvatarModel?
     @State private var currentUser: UserModel?
-    @State private var chat: ChatModel?
+    @State var chat: ChatModel?
     @State private var textMessage: String = ""
     @State private var scrollPosition: String?
     @State private var showAlert: AnyAppAlert?
@@ -100,9 +100,7 @@ struct ChatView: View {
                 for try await value in self.chatManager.streamChatMessages(chatId: chatId) {
                     if Task.isCancelled { break }
                     
-                    let sortedMessages = value.sorted {
-                        $0.dateCreatedCalculated < $1.dateCreatedCalculated
-                    }
+                    let sortedMessages = value.sortedByKeyPath(keyPath: \.dateCreatedCalculated)
                     
                     await MainActor.run {
                         self.chatMessages = sortedMessages

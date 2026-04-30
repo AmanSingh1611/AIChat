@@ -30,4 +30,13 @@ class ChatManager {
     func streamChatMessages(chatId: String) -> AsyncThrowingStream<[ChatMessageModel], any Error> {
         service.streamChatMessages(chatId: chatId)
     }
+    
+    func getAllChats(userId: String) async throws -> [ChatModel] {
+        try await service.getAllChats(userId: userId)
+    }
+    
+    func getLastChatMessage(chatId: String) async throws -> ChatMessageModel? {
+        try await service.getLastChatMessage(chatId: chatId)
+    }
+    
 }

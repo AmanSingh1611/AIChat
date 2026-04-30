@@ -9,10 +9,13 @@ import SwiftUI
 
 struct ChatsListingView: View {
     @Environment(AvatarManager.self) private var avatarManager
+    @Environment(ChatManager.self) private var chatManager
+    @Environment(AuthManager.self) private var authManager
     
-    @State private var chats: [ChatModel] = ChatModel.mocks
-    @State private var recentAvatars: [AvatarModel] = AvatarModel.mocks
+    @State private var chats: [ChatModel] = []
+    @State private var recentAvatars: [AvatarModel] = []
     @State private var path: [NavigationPathOption] = []
+    @State private var isLoadingChats: Bool = true
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -28,7 +31,21 @@ struct ChatsListingView: View {
             .onAppear {
                 loadRecentAvatars()
             }
+            .task {
+                await loadChatsListing()
+            }
         }
+    }
+    
+    private func loadChatsListing() async {
+        do {
+            let userId = try authManager.getAuthId()
+            chats = try await chatManager.getAllChats(userId: userId).sortedByKeyPath(keyPath: \.dateModified, ascending: false)
+        } catch {
+            print("Failed to load chats")
+        }
+        
+        isLoadingChats = false
     }
     
     private func loadRecentAvatars() {
@@ -41,7 +58,12 @@ struct ChatsListingView: View {
     
     private var chatsSection: some View {
         Section {
-            if chats.isEmpty {
+            if isLoadingChats {
+                ProgressView()
+                    .padding(40)
+                    .frame(maxWidth: .infinity)
+                    .removeListRowFormatting()
+            } else if chats.isEmpty {
                 Text("Your chats will appear here!")
                     .foregroundStyle(.secondary)
                     .font(.title3)
@@ -52,15 +74,13 @@ struct ChatsListingView: View {
             } else {
                 ForEach(chats) { chat in
                     ChatRowCellViewBuilder(
-                        currentUserId: nil,
+                        currentUserId: authManager.userAuth?.uid,
                         chat: chat,
                         getAvatar: {
-                            try? await Task.sleep(for: .seconds(1))
-                            return AvatarModel.mocks.randomElement()!
+                            try? await avatarManager.getAvatar(id: chat.avatarId)
                         },
                         getLastChatMessage: {
-                            try? await Task.sleep(for: .seconds(1))
-                            return ChatMessageModel.mocks.randomElement()!
+                            try? await chatManager.getLastChatMessage(chatId: chat.id)
                         }
                     )
                     .anyButton(.highlight, action: {
@@ -70,7 +90,7 @@ struct ChatsListingView: View {
                 }
             }
         } header: {
-            Text("Chats")
+            Text(chats.isEmpty ? "" : "Chats")
         }
     }
     
@@ -106,14 +126,31 @@ struct ChatsListingView: View {
     }
     
     private func onChatPressed(chat: ChatModel) {
-        path.append(.chat(avatarId: chat.avatarId))
+        path.append(.chat(avatarId: chat.avatarId, chat: chat))
     }
     
     private func onAvatarPressed(avatar: AvatarModel) {
-        path.append(.chat(avatarId: avatar.avatarId))
+        path.append(.chat(avatarId: avatar.avatarId, chat: nil))
     }
 }
 
-#Preview {
+#Preview("Has data") {
     ChatsListingView()
+        .previewEnvironment()
+}
+#Preview("No data") {
+    ChatsListingView()
+        .environment(
+            AvatarManager(
+                service: MockRemoteAvatarService(avatars: []),
+                local: MockLocalAvatarPersistence(avatars: [])
+            )
+        )
+        .environment(ChatManager(service: MockChatService(chats: [])))
+        .previewEnvironment()
+}
+#Preview("Slow loading chats") {
+    ChatsListingView()
+        .environment(ChatManager(service: MockChatService(delay: 5)))
+        .previewEnvironment()
 }

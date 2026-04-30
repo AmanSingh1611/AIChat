@@ -5,8 +5,9 @@
 //  Created by Aman on 07/03/26.
 //
 import Foundation
+import IdentifiableByString
 
-struct ChatMessageModel: Identifiable, Codable {
+struct ChatMessageModel: Identifiable, Codable, StringIdentifiable {
     
     let id: String
     let chatId: String
@@ -31,7 +32,7 @@ struct ChatMessageModel: Identifiable, Codable {
         self.dateCreated = dateCreated
     }
     
-    var dateCreatedCalculated : Date {
+    var dateCreatedCalculated: Date {
         dateCreated ?? .distantPast
     }
     

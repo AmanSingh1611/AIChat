@@ -14,6 +14,7 @@ struct SettingsView: View {
     @Environment(AppState.self) private var appState
     @Environment(UserManager.self) private var userManager
     @Environment(AvatarManager.self) private var avatarManager
+    @Environment(ChatManager.self) private var chatManager
     
     @State private var isPremium: Bool = true
     @State private var isAnonymousUser = false
@@ -172,9 +173,10 @@ struct SettingsView: View {
                 
                 async let deleteAuth: () = authManager.deleteAccount()
                 async let deleteUser: () = userManager.deleteCurrentUser()
+                async let deleteAllChats: () = chatManager.deleteAllChatsForUser(userId: userId)
                 async let deleteAvatars: () = avatarManager.removeAuthorIdFromAllUserAvatars(userId: userId)
                 
-                _ = try await (deleteAuth, deleteUser, deleteAvatars)
+                _ = try await (deleteAuth, deleteUser, deleteAvatars, deleteAllChats)
                 
                 await dismissScreen()
             } catch {

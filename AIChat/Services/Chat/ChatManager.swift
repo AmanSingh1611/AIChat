@@ -39,4 +39,16 @@ class ChatManager {
         try await service.getLastChatMessage(chatId: chatId)
     }
     
+    func deleteChat(chatId: String) async throws {
+        try await service.deleteChat(chatId: chatId)
+    }
+    
+    func deleteAllChatsForUser(userId: String) async throws {
+        try await service.deleteAllChatsForUser(userId: userId)
+    }
+    
+    func reportChat(chatId: String, userId: String) async throws {
+        let report = ChatReportModel.new(chatId: chatId, userId: userId)
+        try await service.reportChat(report: report)
+    }
 }

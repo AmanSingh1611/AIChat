@@ -46,7 +46,7 @@ extension View {
                         Text(subtitle)
                     }
                 }
-        case .confirmationDialogue:
+        case .confirmationDialog:
             self
                 .confirmationDialog(alert.wrappedValue?.title ?? "", isPresented: Binding(ifNotNil: alert)) {
                     alert.wrappedValue?.buttons()
@@ -60,5 +60,5 @@ extension View {
 }
 
 enum AlertType {
-    case alert, confirmationDialogue
+    case alert, confirmationDialog
 }

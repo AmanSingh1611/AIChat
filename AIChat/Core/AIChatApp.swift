@@ -83,7 +83,7 @@ struct Dependencies {
             self.avatarManager = AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistence())
             self.chatManager = ChatManager(service: MockChatService())
             self.logManager = LogManager(services: [
-                ConsoleService()
+                ConsoleService(printParameters: false)
             ])
         case .dev:
             self.authManager = AuthManager(service: FirebaseAuthService())

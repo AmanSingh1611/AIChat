@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UserAuthInfo: Sendable {
+struct UserAuthInfo: Sendable, Codable {
     let uid: String
     let email: String?
     let isAnonymous: Bool

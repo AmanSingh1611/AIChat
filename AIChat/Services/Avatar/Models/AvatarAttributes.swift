@@ -26,8 +26,23 @@ struct AvatarDescriptionBuilder {
         self.characterLocation = avatar.characterLocation ?? .default
     }
     
+    enum CodingKeys: String, CodingKey {
+        case characterOption = "character_option"
+        case characterAction = "character_action"
+        case characterLocation = "character_location"
+    }
+    
     var characterDescription: String {
         "A \(characterOption.rawValue) that is \(characterAction.rawValue) in the \(characterLocation.rawValue)"
+    }
+    
+    var eventParameters: [String: Any] {
+        [
+            CodingKeys.characterOption.rawValue: characterOption.rawValue,
+            CodingKeys.characterAction.rawValue: characterAction.rawValue,
+            CodingKeys.characterLocation.rawValue: characterLocation.rawValue,
+            "character_description": characterDescription
+        ]
     }
 }
 

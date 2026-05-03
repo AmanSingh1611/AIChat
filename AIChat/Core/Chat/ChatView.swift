@@ -114,7 +114,7 @@ struct ChatView: View {
                     }
                 }
             } catch {
-                print("Chat view failed to attach listener: \(error)")
+                logManager.trackEvent(event: Event.loadMessagesFail(error: error))
             }
         }
     }

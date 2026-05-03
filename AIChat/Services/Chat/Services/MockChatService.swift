@@ -13,7 +13,6 @@ class MockChatService: ChatService {
         
     }
     
-    
     let chats: [ChatModel]
     @Published private var messages: [ChatMessageModel]
     let delay: Double

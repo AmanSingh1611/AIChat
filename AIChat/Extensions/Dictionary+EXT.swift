@@ -1,0 +1,15 @@
+//
+//  Dictionary+EXT.swift
+//  AIChat
+//
+//  Created by Aman Kumar Singh on 03/05/26.
+//
+
+import Foundation
+
+extension Dictionary where Key == String, Value == Any {
+    
+    var asAlphabeticalArray: [(key: String, value: Any)] {
+        self.map({ (key: $0, value: $1) }).sortedByKeyPath(keyPath: \.key)
+    }
+}

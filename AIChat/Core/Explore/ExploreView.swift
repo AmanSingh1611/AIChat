@@ -18,6 +18,15 @@ struct ExploreView: View {
     @State private var isLoadingPopular: Bool = true
     
     @State private var path: [NavigationPathOption] = []
+    @State private var showDevSettings: Bool = false
+
+    private var showDevSettingsButton: Bool {
+        #if DEV || MOCK
+        return true
+        #else
+        return false
+        #endif
+    }
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -43,6 +52,16 @@ struct ExploreView: View {
                 }
             }
             .navigationTitle("Explore")
+            .toolbar(content: {
+                ToolbarItem(placement: .topBarLeading) {
+                    if showDevSettingsButton {
+                        devSettingsButton
+                    }
+                }
+            })
+            .sheet(isPresented: $showDevSettings, content: {
+                DevSettingsView()
+            })
             .navigationDestinationForCoreModule(path: $path)
             .task {
                 await loadFeaturedAvatars()
@@ -52,7 +71,18 @@ struct ExploreView: View {
             }
         }
     }
-    // Preview Avatars 9:18
+    
+    private var devSettingsButton: some View {
+        Text("DEV")
+            .anyButton(.press) {
+                onDevSettingsPressed()
+            }
+    }
+    
+    private func onDevSettingsPressed() {
+        showDevSettings = true
+    }
+    
     private func loadFeaturedAvatars() async {
         do {
             featuredAvatars = try await avatarManager.getFeaturedAvatars()

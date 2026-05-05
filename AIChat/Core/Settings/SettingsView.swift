@@ -15,6 +15,7 @@ struct SettingsView: View {
     @Environment(UserManager.self) private var userManager
     @Environment(AvatarManager.self) private var avatarManager
     @Environment(ChatManager.self) private var chatManager
+    @Environment(LogManager.self) private var logManager
     
     @State private var isPremium: Bool = true
     @State private var isAnonymousUser = false
@@ -39,6 +40,7 @@ struct SettingsView: View {
                 setAnonymousAccountStatus()
             }
             .showCustomAlert(alert: $showAlert)
+            .screenAppearAnalytics(name: "SettingsView")
         }
     }
     
@@ -131,13 +133,17 @@ struct SettingsView: View {
     }
     
     func onSignOutButtonPressed() {
+        logManager.trackEvent(event: Event.signOutStart)
         Task {
             do {
                 try authManager.signOut()
                 userManager.signOut()
+                logManager.trackEvent(event: Event.signOutSuccess)
+                
                 await dismissScreen()
             } catch {
                 showAlert = AnyAppAlert(error: error)
+                logManager.trackEvent(event: Event.signOutFail(error: error))
             }
         }
     }
@@ -149,6 +155,8 @@ struct SettingsView: View {
     }
     
     func onDeleteButtonPressed() {
+        logManager.trackEvent(event: Event.deleteAccountStart)
+        
         showAlert = AnyAppAlert(
             title: "Delete Account?",
             subtitle: "This action is permanent and cannot be undone.",
@@ -167,6 +175,8 @@ struct SettingsView: View {
     }
     
     func onDeleteAccountConfirmed() {
+        logManager.trackEvent(event: Event.deleteAccountStartConfirm)
+        
         Task {
             do {
                 let userId = try authManager.getAuthId()
@@ -177,20 +187,66 @@ struct SettingsView: View {
                 async let deleteAvatars: () = avatarManager.removeAuthorIdFromAllUserAvatars(userId: userId)
                 
                 _ = try await (deleteAuth, deleteUser, deleteAvatars, deleteAllChats)
+                logManager.deleteUserProfile()
+                logManager.trackEvent(event: Event.deleteAccountSuccess)
                 
                 await dismissScreen()
             } catch {
                 showAlert = AnyAppAlert(error: error)
+                logManager.trackEvent(event: Event.deleteAccountFail(error: error))
             }
         }
     }
     
     func onCreateAccountPressed() {
         showCreateAccountView = true
+        logManager.trackEvent(event: Event.createAccountPressed)
     }
     
     private func setAnonymousAccountStatus() {
         isAnonymousUser = authManager.userAuth?.isAnonymous == true
+    }
+    
+    enum Event: LoggableEvent {
+        case signOutStart
+        case signOutSuccess
+        case signOutFail(error: Error)
+        case deleteAccountStart
+        case deleteAccountStartConfirm
+        case deleteAccountSuccess
+        case deleteAccountFail(error: Error)
+        case createAccountPressed
+        
+        var eventName: String {
+            switch self {
+            case .signOutStart:                 return "SettingsView_SignOut_Start"
+            case .signOutSuccess:               return "SettingsView_SignOut_Success"
+            case .signOutFail:                  return "SettingsView_SignOut_Fail"
+            case .deleteAccountStart:           return "SettingsView_DeleteAccount_Start"
+            case .deleteAccountStartConfirm:    return "SettingsView_DeleteAccount_StartConfirm"
+            case .deleteAccountSuccess:         return "SettingsView_DeleteAccount_Success"
+            case .deleteAccountFail:            return "SettingsView_DeleteAccount_Fail"
+            case .createAccountPressed:         return "SettingsView_CreateAccount_Pressed"
+            }
+        }
+        
+        var parameters: [String: Any]? {
+            switch self {
+            case .signOutFail(error: let error), .deleteAccountFail(error: let error):
+                return error.eventParameters
+            default:
+                return nil
+            }
+        }
+        
+        var type: LogType {
+            switch self {
+            case .signOutFail, .deleteAccountFail:
+                return .severe
+            default:
+                return .analytic
+            }
+        }
     }
 }
 

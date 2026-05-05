@@ -77,37 +77,39 @@ struct Dependencies {
         
         switch config {
         case .mock(isSignedIn: let isSignedIn):
-            self.authManager = AuthManager(service: MockAuthService(user: isSignedIn ? .mock() : nil))
-            self.userManager = UserManager(services: MockUserServices(user: isSignedIn ? .mock : nil))
-            self.aiManager = AIManager(imageGenerationService: MockAIService(), textGenerationService: MockAIService())
-            self.avatarManager = AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistence())
-            self.chatManager = ChatManager(service: MockChatService())
             self.logManager = LogManager(services: [
                 ConsoleService(printParameters: false)
             ])
+            self.authManager = AuthManager(service: MockAuthService(user: isSignedIn ? .mock() : nil), logManager: logManager)
+            self.userManager = UserManager(services: MockUserServices(user: isSignedIn ? .mock : nil), logManager: logManager)
+            self.aiManager = AIManager(imageGenerationService: MockAIService(), textGenerationService: MockAIService())
+            self.avatarManager = AvatarManager(service: MockRemoteAvatarService(), local: MockLocalAvatarPersistence())
+            self.chatManager = ChatManager(service: MockChatService())
+            
         case .dev:
-            self.authManager = AuthManager(service: FirebaseAuthService())
-            self.userManager = UserManager(services: ProductionUserServices())
-            self.aiManager = AIManager(imageGenerationService: AppleAIService(), textGenerationService: FoundationModelService())
-            self.avatarManager = AvatarManager(service: FirebaseAvatarService(imageUploadService: AppwriteImageUploadService()), local: SwiftDataLocalAvatarPersistence())
-            self.chatManager = ChatManager(service: FirebaseChatService())
             self.logManager = LogManager(services: [
                 ConsoleService(),
                 FirebaseAnalyticsService(),
                 MixpanelService(token: MixpanelConstants.token, loggingEnabled: true),
                 FirebaseCrashlyticsService()
             ])
-        case .prod:
-            self.authManager = AuthManager(service: FirebaseAuthService())
-            self.userManager = UserManager(services: ProductionUserServices())
+            self.authManager = AuthManager(service: FirebaseAuthService(), logManager: logManager)
+            self.userManager = UserManager(services: ProductionUserServices(), logManager: logManager)
             self.aiManager = AIManager(imageGenerationService: AppleAIService(), textGenerationService: FoundationModelService())
             self.avatarManager = AvatarManager(service: FirebaseAvatarService(imageUploadService: AppwriteImageUploadService()), local: SwiftDataLocalAvatarPersistence())
             self.chatManager = ChatManager(service: FirebaseChatService())
+            
+        case .prod:
             self.logManager = LogManager(services: [
                 FirebaseAnalyticsService(),
                 MixpanelService(token: MixpanelConstants.token),
                 FirebaseCrashlyticsService()
             ])
+            self.authManager = AuthManager(service: FirebaseAuthService(), logManager: logManager)
+            self.userManager = UserManager(services: ProductionUserServices(), logManager: logManager)
+            self.aiManager = AIManager(imageGenerationService: AppleAIService(), textGenerationService: FoundationModelService())
+            self.avatarManager = AvatarManager(service: FirebaseAvatarService(imageUploadService: AppwriteImageUploadService()), local: SwiftDataLocalAvatarPersistence())
+            self.chatManager = ChatManager(service: FirebaseChatService())
         }
     }
 }

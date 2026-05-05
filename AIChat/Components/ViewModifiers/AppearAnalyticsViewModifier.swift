@@ -29,7 +29,7 @@ struct AppearAnalyticsViewModifier: ViewModifier {
         var eventName: String {
             switch self {
             case .appear(name: let name):           return "\(name)_Appear"
-            case .disappear(name: let name):        return "\(name)_Appear"
+            case .disappear(name: let name):        return "\(name)_Disappear"
             }
         }
         

@@ -13,37 +13,45 @@ import SwiftfulUtilities
 class UserManager {
     private let remote: RemoteUserService
     private let local: LocalUserPersistence
+    private let logManager: LogManager?
     
     private(set) var currentUser: UserModel?
     private var listenerTask: Task<Void, Never>?
     
-    init(services: UserServices) {
+    init(services: UserServices, logManager: LogManager? = nil) {
         self.remote = services.remote
         self.local = services.local
+        self.logManager = logManager
         self.currentUser = local.getCurrentUser()
     }
     
     func logIn(userAuth: UserAuthInfo, isNewUser: Bool) async throws {
         let creationVersion = isNewUser ? Utilities.appVersion : nil
-        
         let user = UserModel(userAuth: userAuth, creationVersion: creationVersion)
+        logManager?.trackEvent(event: Event.logInStart(user: user))
+        
         try await remote.saveUser(user: user)
+        logManager?.trackEvent(event: Event.logInSuccess(user: user))
+        
         addCurrentUserListener(userId: user.userId)
         
     }
     
     func addCurrentUserListener(userId: String) {
         listenerTask?.cancel()
-
+        logManager?.trackEvent(event: Event.remoteListenerStart)
+        
         listenerTask = Task {
             do {
                 for try await value in remote.addListener(to: userId) {
                     self.currentUser = value
+                    logManager?.trackEvent(event: Event.remoteListenerSuccess(user: value))
+                    logManager?.addUserProperties(dict: value.eventParameters, isHighPriority: true)
+                    
                     self.saveCurrentUserLocally()
-                    print("Successfully added listener to user \(value?.userId ?? "no id")")
                 }
             } catch {
-                print("Error with adding listner to user: \(error)")
+                logManager?.trackEvent(event: Event.remoteListenerFail(error: error))
             }
         }
     }
@@ -57,11 +65,16 @@ class UserManager {
         currentUser = nil
         listenerTask?.cancel()
         listenerTask = nil
+        logManager?.trackEvent(event: Event.signOut)
     }
     
     func deleteCurrentUser() async throws {
+        logManager?.trackEvent(event: Event.deleteAccountStart)
+        
         let userId = try currentUserId()
         try await remote.deleteUser(userId: userId)
+        logManager?.trackEvent(event: Event.deleteAccountSuccess)
+        
         signOut()
     }
     
@@ -73,17 +86,69 @@ class UserManager {
     }
     
     func saveCurrentUserLocally() {
+        logManager?.trackEvent(event: Event.saveLocalStart(user: currentUser))
+        
         Task {
             do {
                 try local.saveCurrentUser(user: currentUser)
-                print("Success saved current user locally.")
+                logManager?.trackEvent(event: Event.saveLocalSuccess(user: currentUser))
             } catch {
-                print("Error saving current user locally \(error).")
+                logManager?.trackEvent(event: Event.saveLocalFail(error: error))
             }
         }
     }
     
     enum UserManagerError: LocalizedError {
         case noUserId
+    }
+    
+    enum Event: LoggableEvent {
+        case logInStart(user: UserModel?)
+        case logInSuccess(user: UserModel?)
+        case remoteListenerStart
+        case remoteListenerSuccess(user: UserModel?)
+        case remoteListenerFail(error: Error)
+        case saveLocalStart(user: UserModel?)
+        case saveLocalSuccess(user: UserModel?)
+        case saveLocalFail(error: Error)
+        case signOut
+        case deleteAccountStart
+        case deleteAccountSuccess
+        
+        var eventName: String {
+            switch self {
+            case .logInStart:               return "UserMan_LogIn_Start"
+            case .logInSuccess:             return "UserMan_LogIn_Success"
+            case .remoteListenerStart:      return "UserMan_RemoteListener_Start"
+            case .remoteListenerSuccess:    return "UserMan_RemoteListener_Success"
+            case .remoteListenerFail:       return "UserMan_RemoteListener_Fail"
+            case .saveLocalStart:           return "UserMan_SaveLocal_Start"
+            case .saveLocalSuccess:         return "UserMan_SaveLocal_Success"
+            case .saveLocalFail:            return "UserMan_SaveLocal_Fail"
+            case .signOut:                  return "UserMan_SignOut"
+            case .deleteAccountStart:       return "UserMan_DeleteAccount_Start"
+            case .deleteAccountSuccess:     return "UserMan_DeleteAccount_Success"
+            }
+        }
+        
+        var parameters: [String: Any]? {
+            switch self {
+            case .logInStart(user: let user), .logInSuccess(user: let user), .remoteListenerSuccess(user: let user), .saveLocalStart(user: let user), .saveLocalSuccess(user: let user):
+                return user?.eventParameters
+            case .remoteListenerFail(error: let error), .saveLocalFail(error: let error):
+                return error.eventParameters
+            default:
+                return nil
+            }
+        }
+        
+        var type: LogType {
+            switch self {
+            case .remoteListenerFail, .saveLocalFail:
+                return .severe
+            default:
+                return .analytic
+            }
+        }
     }
 }

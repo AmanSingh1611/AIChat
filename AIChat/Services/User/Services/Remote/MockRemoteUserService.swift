@@ -17,7 +17,7 @@ struct MockRemoteUserService: RemoteUserService {
         
     }
     
-    func addListener(to userId: String) -> AsyncThrowingStream<UserModel?, any Error> {
+    func addListener(to userId: String) -> AsyncThrowingStream<UserModel, any Error> {
         AsyncThrowingStream { continuation in
             if let currentUser {
                 continuation.yield(currentUser)

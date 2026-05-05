@@ -39,7 +39,7 @@ extension Color {
         )
     }
     
-    func toHex() -> String? {
+    func toHex() -> String {
         let uiColor = UIColor(self)
         
         var redComponent: CGFloat = 0
@@ -53,7 +53,7 @@ extension Color {
             blue: &blueComponent,
             alpha: &alphaComponent
         ) else {
-            return nil
+            return "#FF5757"
         }
         
         let redValue = Int(redComponent * 255)

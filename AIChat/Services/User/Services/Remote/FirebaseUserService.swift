@@ -17,7 +17,7 @@ struct FirebaseUserService: RemoteUserService {
         try collection.document(user.userId).setData(from: user, merge: true)
     }
     
-    func addListener(to userId: String) -> AsyncThrowingStream<UserModel?, any Error> {
+    func addListener(to userId: String) -> AsyncThrowingStream<UserModel, any Error> {
         collection.streamDocument(id: userId)
     }
     

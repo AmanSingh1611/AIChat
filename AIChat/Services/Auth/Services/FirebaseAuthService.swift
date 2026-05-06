@@ -26,6 +26,10 @@ struct FirebaseAuthService: AuthService {
         }
     }
     
+    func removeAuthenticatedUserListener(listener: any NSObjectProtocol) {
+        Auth.auth().removeStateDidChangeListener(listener)
+    }
+    
     func getAuthenticatedUser() -> UserAuthInfo? {
         if let user = Auth.auth().currentUser {
             return UserAuthInfo(user: user)
@@ -81,7 +85,40 @@ struct FirebaseAuthService: AuthService {
         guard let user = Auth.auth().currentUser else {
             throw AuthError.userNotFound
         }
-        try await user.delete()
+        do {
+            try await user.delete()
+        } catch let error as NSError {
+            let authError = AuthErrorCode(rawValue: error.code)
+            
+            switch authError {
+            case .requiresRecentLogin:
+                try await reauthenticateUser(error: error)
+                
+                // Reauth successfull
+                return try await user.delete()
+            default:
+                break
+            }
+        }
+    }
+    
+    private func reauthenticateUser(error: Error) async throws {
+        guard let user = Auth.auth().currentUser, let providerID = user.providerData.first?.providerID else {
+            throw AuthError.userNotFound
+        }
+        
+        let userId = user.uid
+        
+        switch providerID {
+        case "apple.com":
+            let result = try await signInWithApple()
+            guard user.uid == result.user.uid else {
+                throw AuthError.reauthAccountChanged
+            }
+        default:
+            throw error
+        }
+        
     }
 }
 
@@ -96,11 +133,14 @@ extension AuthDataResult {
 
 enum AuthError: LocalizedError {
     case userNotFound
+    case reauthAccountChanged
     
     var errorDescription: String? {
         switch self {
         case .userNotFound:
             "Current authenticated user not found."
+        case .reauthAccountChanged:
+            "Reauthenticated switched accounts. Please check your account."
         }
     }
     }

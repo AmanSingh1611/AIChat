@@ -106,9 +106,7 @@ struct FirebaseAuthService: AuthService {
         guard let user = Auth.auth().currentUser, let providerID = user.providerData.first?.providerID else {
             throw AuthError.userNotFound
         }
-        
-        let userId = user.uid
-        
+    
         switch providerID {
         case "apple.com":
             let result = try await signInWithApple()

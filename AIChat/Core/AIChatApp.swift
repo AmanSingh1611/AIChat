@@ -21,6 +21,7 @@ struct AIChatApp: App {
                 .environment(delegate.dependencies.avatarManager)
                 .environment(delegate.dependencies.chatManager)
                 .environment(delegate.dependencies.logManager)
+                .environment(delegate.dependencies.pushNotificationManager)
         }
     }
 }
@@ -72,6 +73,7 @@ struct Dependencies {
     var avatarManager: AvatarManager
     var chatManager: ChatManager
     var logManager: LogManager
+    var pushNotificationManager: PushNotificationManager
     
     init(config: BuildConfiguration) {
         
@@ -111,6 +113,8 @@ struct Dependencies {
             self.avatarManager = AvatarManager(service: FirebaseAvatarService(imageUploadService: AppwriteImageUploadService()), local: SwiftDataLocalAvatarPersistence())
             self.chatManager = ChatManager(service: FirebaseChatService())
         }
+        
+        pushNotificationManager = PushNotificationManager(logManager: logManager)
     }
 }
 
@@ -124,5 +128,6 @@ extension View {
             .environment(ChatManager(service: MockChatService()))
             .environment(AppState())
             .environment(LogManager(services: []))
+            .environment(PushNotificationManager())
     }
 }

@@ -52,7 +52,9 @@ struct OnboardingColourView: View {
                     }
                 }, header: {
                     Text("Select a Profile Colour")
+                        .multilineTextAlignment(.center)
                         .font(.headline)
+                        .frame(maxWidth: .infinity)
                 })
             }
         )

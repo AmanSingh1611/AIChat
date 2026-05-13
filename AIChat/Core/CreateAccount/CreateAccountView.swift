@@ -24,9 +24,13 @@ struct CreateAccountView: View {
                 Text(title)
                     .font(.largeTitle)
                     .fontWeight(.semibold)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
                 
                 Text(subTitle)
                     .font(.body)
+                    .lineLimit(4)
+                    .minimumScaleFactor(0.5)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
@@ -108,4 +112,5 @@ struct CreateAccountView: View {
 
 #Preview {
     CreateAccountView()
+        .previewEnvironment()
 }

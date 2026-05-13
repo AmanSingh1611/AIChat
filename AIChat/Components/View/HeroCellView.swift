@@ -25,11 +25,15 @@ struct HeroCellView: View {
                 if let title {
                     Text(title)
                         .font(.headline)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.3)
                 }
 
                 if let subtitle {
                     Text(subtitle)
                         .font(.subheadline)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.3)
                 }
             }
             .foregroundStyle(.white)

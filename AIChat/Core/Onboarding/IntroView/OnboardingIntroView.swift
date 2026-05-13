@@ -17,6 +17,7 @@ struct OnboardingIntroView: View {
                  Have \(realConversationsText) with AI generated responses.
                  """
             )
+            .minimumScaleFactor(0.5)
             .padding(.horizontal, 10)
             .frame(maxHeight: .infinity)
             

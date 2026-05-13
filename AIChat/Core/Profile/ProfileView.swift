@@ -113,6 +113,8 @@ struct ProfileView: View {
         } header: {
             HStack(spacing: 0) {
                 Text("My Avatars")
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.3)
                 
                 Spacer()
                 

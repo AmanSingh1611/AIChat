@@ -47,6 +47,8 @@ struct WelcomeView: View {
             Text("AI Chat ")
                 .font(.largeTitle)
                 .fontWeight(.semibold)
+                .lineLimit(1)
+                .minimumScaleFactor(0.3)
         }
     }
     
@@ -57,6 +59,8 @@ struct WelcomeView: View {
             } label: {
                 Text("Get Started")
                     .callToActionButton()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.3)
             }
             .padding(16)
             
@@ -68,6 +72,8 @@ struct WelcomeView: View {
                 .onTapGesture {
                     onSignInPressed()
                 }
+                .lineLimit(1)
+                .minimumScaleFactor(0.3)
         }
     }
     
@@ -90,6 +96,8 @@ struct WelcomeView: View {
         HStack(spacing: 8) {
             Link(destination: URL(string: Constants.termsAndServicesLink)!) {
                 Text("Terms of Service")
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.3)
             }
             
             Circle()
@@ -98,6 +106,8 @@ struct WelcomeView: View {
             
             Link(destination: URL(string: Constants.privacyPolicyLink)!) {
                 Text("Privacy Policy")
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.3)
             }
         }
     }
@@ -136,4 +146,5 @@ struct WelcomeView: View {
 #Preview {
     WelcomeView()
         .environment(AppState())
+        .previewEnvironment()
 }

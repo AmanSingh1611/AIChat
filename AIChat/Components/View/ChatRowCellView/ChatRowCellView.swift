@@ -42,7 +42,7 @@ struct ChatRowCellView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.3)
+                        .minimumScaleFactor(1)
                 }
             }
             .lineLimit(1)

@@ -67,30 +67,31 @@ struct SettingsView: View {
     
     private var accountSection: some View {
         Section {
-            if isAnonymousUser {
-                Text("Save & back-up account")
-                    .rowFormatting()
-                    .anyButton(.highlight) {
-                        onRatingsButtonPressed()
-                    }
-                    .removeListRowFormatting()
-                   
-            } else {
-                Text("Sign Out")
-                    .rowFormatting()
-                    .anyButton(.highlight) {
-                        onSignOutButtonPressed()
-                    }
-                    .removeListRowFormatting()
-            }
-            
-            Text("Delete account")
-                .foregroundStyle(.red)
-                .rowFormatting()
-                .anyButton(.highlight) {
-                    onDeleteButtonPressed()
+            VStack(spacing: 1) {
+                if isAnonymousUser {
+                    Text("Save & back-up account")
+                        .rowFormatting()
+                        .anyButton(.highlight) {
+                            onRatingsButtonPressed()
+                        }
+                       
+                } else {
+                    Text("Sign Out")
+                        .rowFormatting()
+                        .anyButton(.highlight) {
+                            onSignOutButtonPressed()
+                        }
                 }
-                .removeListRowFormatting()
+                
+                Text("Delete account")
+                    .foregroundStyle(.red)
+                    .rowFormatting()
+                    .anyButton(.highlight) {
+                        onDeleteButtonPressed()
+                    }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .removeListRowFormatting()
         } header: {
             Text("Account")
         }
@@ -98,21 +99,24 @@ struct SettingsView: View {
     
     private var purchaseSection: some View {
         Section {
-            HStack(spacing: 8) {
-                Text("Account Status: \(isPremium ? "PREMIUM" : "FREE")")
-                
-                Spacer(minLength: 0)
-                
-                if isPremium {
-                    Text("MANAGE")
-                        .badgeButton()
+            VStack(spacing: 1) {
+                HStack(spacing: 8) {
+                    Text("Account Status: \(isPremium ? "PREMIUM" : "FREE")")
+                    
+                    Spacer(minLength: 0)
+                    
+                    if isPremium {
+                        Text("MANAGE")
+                            .badgeButton()
+                    }
                 }
+                .rowFormatting()
+                .anyButton(.highlight, action: {
+                    
+                })
+                .disabled(!isPremium)
             }
-            .rowFormatting()
-            .anyButton(.highlight, action: {
-                
-            })
-            .disabled(!isPremium)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
             .removeListRowFormatting()
         } header: {
             Text("Purchase")
@@ -121,39 +125,39 @@ struct SettingsView: View {
     
     private var applicationSection: some View {
         Section {
-            Text("Rate Us on App Store!")
-                .foregroundStyle(.blue)
-                .rowFormatting()
-                .anyButton(.highlight) {
-                    onRatingsButtonPressed()
+            VStack(spacing: 1) {
+                Text("Rate Us on App Store!")
+                    .foregroundStyle(.blue)
+                    .rowFormatting()
+                    .anyButton(.highlight) {
+                        onRatingsButtonPressed()
+                    }
+                
+                HStack(spacing: 8) {
+                    Text("App Version")
+                    Spacer(minLength: 0)
+                    Text(Utilities.appVersion ?? "")
+                        .foregroundStyle(.secondary)
                 }
-                .removeListRowFormatting()
-            
-            HStack(spacing: 8) {
-                Text("App Version")
-                Spacer(minLength: 0)
-                Text(Utilities.appVersion ?? "")
-                    .foregroundStyle(.secondary)
-            }
-            .rowFormatting()
-            .removeListRowFormatting()
-            
-            HStack(spacing: 8) {
-                Text("Build Number")
-                Spacer(minLength: 0)
-                Text(Utilities.buildNumber ?? "")
-                    .foregroundStyle(.secondary)
-            }
-            .rowFormatting()
-            .removeListRowFormatting()
-            
-            Text("Contact Us")
-                .foregroundStyle(.blue)
                 .rowFormatting()
-                .anyButton(.highlight) {
-                    onContactUsPressed()
+                
+                HStack(spacing: 8) {
+                    Text("Build Number")
+                    Spacer(minLength: 0)
+                    Text(Utilities.buildNumber ?? "")
+                        .foregroundStyle(.secondary)
                 }
-                .removeListRowFormatting()
+                .rowFormatting()
+                
+                Text("Contact Us")
+                    .foregroundStyle(.blue)
+                    .rowFormatting()
+                    .anyButton(.highlight) {
+                        onContactUsPressed()
+                    }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .removeListRowFormatting()
         } header: {
             Text("Application")
         } footer: {
@@ -238,12 +242,14 @@ struct SettingsView: View {
             do {
                 let userId = try authManager.getAuthId()
                 
-                async let deleteAuth: () = authManager.deleteAccount()
-                async let deleteUser: () = userManager.deleteCurrentUser()
-                async let deleteAllChats: () = chatManager.deleteAllChatsForUser(userId: userId)
-                async let deleteAvatars: () = avatarManager.removeAuthorIdFromAllUserAvatars(userId: userId)
+                try await chatManager.deleteAllChatsForUser(userId: userId)
                 
-                _ = try await (deleteAuth, deleteUser, deleteAvatars, deleteAllChats)
+                try await avatarManager.removeAuthorIdFromAllUserAvatars(userId: userId)
+                
+                try await userManager.deleteCurrentUser()
+                
+                try await authManager.deleteAccount()
+                
                 logManager.deleteUserProfile()
                 logManager.trackEvent(event: Event.deleteAccountSuccess)
                 

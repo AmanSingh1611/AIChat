@@ -15,31 +15,47 @@ struct AppView: View {
     @Environment(LogManager.self) private var logManager
     
     var body: some View {
-        AppViewBuilder(
-            showTabBarView: appState.showTabBarView,
-            tabbarView: {
-                TabBarView()
-            },
-            onboardingView: {
-                WelcomeView()
-            }
-        )
-        .environment(appState)
-        .screenAppearAnalytics(name: "AppView")
-        .task {
-            await checkUserStatus()
-        }
-        .task {
-            try? await Task.sleep(for: .seconds(2))
-            await showATTPromptIfNeeded()
-        }
-        .onChange(of: appState.showTabBarView) { _, showTabBar in
-            if !showTabBar {
-                Task {
+        
+        RootView(
+            delegate: RootDelegate(
+                onApplicationDidAppear: nil,
+                onApplicationWillEnterForeground: { _ in
+                    Task {
+                        await checkUserStatus()
+                    }
+                },
+                onApplicationDidBecomeActive: nil,
+                onApplicationWillResignActive: nil,
+                onApplicationDidEnterBackground: nil,
+                onApplicationWillTerminate: nil
+            ), content: {
+                AppViewBuilder(
+                    showTabBarView: appState.showTabBarView,
+                    tabbarView: {
+                        TabBarView()
+                    },
+                    onboardingView: {
+                        WelcomeView()
+                    }
+                )
+                .environment(appState)
+                .screenAppearAnalytics(name: "AppView")
+                .task {
                     await checkUserStatus()
                 }
+                .task {
+                    try? await Task.sleep(for: .seconds(2))
+                    await showATTPromptIfNeeded()
+                }
+                .onChange(of: appState.showTabBarView) { _, showTabBar in
+                    if !showTabBar {
+                        Task {
+                            await checkUserStatus()
+                        }
+                    }
+                }
             }
-        }
+        )
     }
     
     enum Event: LoggableEvent {
